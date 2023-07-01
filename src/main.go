@@ -27,13 +27,13 @@ func init() {
 
 	config := cmd.GetConfig()
 
-	store_dir := os.Getenv("NSC_STORE")
-	if store_dir == "" {
-		store_dir = "/tmp"
+	storeDir := os.Getenv("NSC_STORE")
+	if storeDir == "" {
+		storeDir = "/tmp"
 	}
 
 	store.KeyStorePath = "/nsc/keys"
-	config.StoreRoot = "/" + store_dir
+	config.StoreRoot = "/" + storeDir
 
 	if _, err := os.Stat(config.StoreRoot); os.IsNotExist(err) {
 		fmt.Println("StoreRoot does not exist")
