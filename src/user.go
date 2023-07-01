@@ -103,7 +103,6 @@ func describeUser(c echo.Context) error {
 	var operatorCmd = lookupCommand(describeCmd, "user")
 
 	var r, w, _ = os.Pipe()
-	defer w.Close()
 
 	old := os.Stdout
 	os.Stdout = w
@@ -116,6 +115,7 @@ func describeUser(c echo.Context) error {
 		return badRequest(c, err)
 	}
 	os.Stdout = old
+	w.Close()
 
 	if all, err := io.ReadAll(r); err != nil {
 		return badRequest(c, err)
