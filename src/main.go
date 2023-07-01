@@ -6,6 +6,10 @@ import (
 	"github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
 	"os"
+
+	"github.com/swaggo/echo-swagger"
+
+	_ "github.com/Drakorgaur/jetono-api/docs"
 )
 
 var e = echo.New()
@@ -43,5 +47,7 @@ func init() {
 
 func Api() {
 	// Start server
+	e.GET("/docs/*", echoSwagger.WrapHandler)
+
 	e.Logger.Fatal(e.Start(":1323"))
 }

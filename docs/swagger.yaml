@@ -1,0 +1,320 @@
+definitions:
+  src.AccountDescription:
+    properties:
+      iat:
+        type: integer
+      iss:
+        type: string
+      jti:
+        type: string
+      name:
+        type: string
+      nats:
+        properties:
+          authorization:
+            properties:
+              auth_users: {}
+            type: object
+          default_permissions:
+            properties:
+              pub:
+                additionalProperties: true
+                type: object
+              sub:
+                additionalProperties: true
+                type: object
+            type: object
+          limits:
+            properties:
+              conn:
+                type: integer
+              data:
+                type: integer
+              exports:
+                type: integer
+              imports:
+                type: integer
+              leaf:
+                type: integer
+              payload:
+                type: integer
+              subs:
+                type: integer
+              wildcards:
+                type: boolean
+            type: object
+          type:
+            type: string
+          version:
+            type: integer
+        type: object
+      sub:
+        type: string
+    type: object
+  src.OperatorDescription:
+    properties:
+      iat:
+        type: integer
+      iss:
+        type: string
+      jti:
+        type: string
+      name:
+        type: string
+      nats:
+        properties:
+          type:
+            type: string
+          version:
+            type: integer
+        type: object
+      sub:
+        type: string
+    type: object
+  src.SimpleJSONResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /operator:
+    post:
+      description: Add an operator to the store
+      parameters:
+      - description: Operator name
+        in: formData
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator added
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add an operator
+      tags:
+      - Operator
+  /operator/{name}:
+    get:
+      description: Returns json object with operator description
+      parameters:
+      - description: Operator name
+        in: path
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator description
+          schema:
+            $ref: '#/definitions/src.OperatorDescription'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Describes an operator
+      tags:
+      - Operator
+  /operator/{operator}/account:
+    post:
+      description: Add an account with given operator to the store
+      parameters:
+      - description: Account name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Account added
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add an account
+      tags:
+      - Account
+  /operator/{operator}/account/{account}/user:
+    post:
+      description: Add user with given operator and account to the store
+      parameters:
+      - description: Username
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Account name
+        in: path
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: User added
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add user
+      tags:
+      - User
+  /operator/{operator}/account/{account}/user/{name}:
+    get:
+      description: Returns json object with user description
+      parameters:
+      - description: Account name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Account name
+        in: path
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator description
+          schema:
+            $ref: '#/definitions/src.AccountDescription'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Describes user
+      tags:
+      - User
+  /operator/{operator}/account/{account}/users:
+    get:
+      description: Returns json list of existing users for given operator's account
+      parameters:
+      - description: Account name
+        in: path
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: List of users for given operator's account
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List users
+      tags:
+      - User
+  /operator/{operator}/account/{name}:
+    get:
+      description: Returns json object with account description
+      parameters:
+      - description: Account name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator description
+          schema:
+            $ref: '#/definitions/src.AccountDescription'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Describes an account
+      tags:
+      - Account
+  /operator/{operator}/accounts:
+    get:
+      description: Returns json list of existing accounts for given operator
+      parameters:
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator's accounts list
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List accounts
+      tags:
+      - Account
+  /operators:
+    get:
+      description: Returns json list of existing operators
+      responses:
+        "200":
+          description: Operators list
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List operators
+      tags:
+      - Operator
+swagger: "2.0"
