@@ -77,23 +77,29 @@ func listUsers(c echo.Context) error {
 
 	ctx, err := nsc.NewActx(&cobra.Command{}, []string{})
 	if err != nil {
-		return c.JSON(400, err)
+		return c.JSON(400, err.Error())
 	}
 
 	entries, err := nsc.ListUsers(ctx.StoreCtx().Store, c.Param("account"))
 	if err != nil {
-		return c.JSON(400, err)
+		return c.JSON(400, err.Error())
 	}
 
 	var users []string
+	var errors []string
 
 	for _, e := range entries {
 		if e.Err == nil {
-			_ = append(users, e.Name)
+			users = append(users, e.Name)
+		} else {
+			errors = append(errors, e.Err.Error())
 		}
 	}
 
-	// TODO: returns null
+	if len(errors) > 0 {
+		return c.JSON(200, errors)
+	}
+
 	return c.JSON(200, users)
 }
 
