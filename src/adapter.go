@@ -12,3 +12,9 @@ func lookupCommand(root *cobra.Command, name string) *cobra.Command {
 	}
 	return nil
 }
+
+func omitCmdOutput() error {
+	// TODO: implement
+	// function should set cobra.Command outputFlag to /dev/null
+	return nil
+}

@@ -31,13 +31,10 @@ func addAccount(c echo.Context) error {
 	nsc.GetConfig().Operator = c.Param("operator")
 
 	cmd := nsc.CreateAddAccountCmd()
-	err := cmd.RunE(cmd, []string{c.FormValue("name")})
-	if err != nil {
-		return c.JSON(400, &SimpleJSONResponse{
-			Status:  "400",
-			Message: err.Error(),
-		})
+	if err := cmd.RunE(cmd, []string{c.FormValue("name")}); err != nil {
+		return badRequest(c, err)
 	}
+
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
 		Message: "Account added",
@@ -62,14 +59,11 @@ func listAccounts(c echo.Context) error {
 
 	config.Operator = c.QueryParam("operator")
 
-	accounts, err := config.ListAccounts()
-	if err != nil {
-		return c.JSON(400, &SimpleJSONResponse{
-			Status:  "400",
-			Message: err.Error(),
-		})
+	if accounts, err := config.ListAccounts(); err != nil {
+		return badRequest(c, err)
+	} else {
+		return c.JSON(200, accounts)
 	}
-	return c.JSON(200, accounts)
 }
 
 // @Tags			Account
@@ -83,14 +77,7 @@ func listAccounts(c echo.Context) error {
 func describeAccount(c echo.Context) error {
 	config := nsc.GetConfig()
 
-	if operator := c.QueryParam("operator"); operator == "" {
-		return c.JSON(400, &SimpleJSONResponse{
-			Status:  "400",
-			Message: "Operator name is required",
-		})
-	} else {
-		config.Operator = operator
-	}
+	config.Operator = c.QueryParam("operator")
 
 	describeCmd := lookupCommand(nsc.GetRootCmd(), "describe")
 	accountCmd := lookupCommand(describeCmd, "account")

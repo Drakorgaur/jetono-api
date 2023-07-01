@@ -19,6 +19,8 @@ func GetEchoRoot() *echo.Echo {
 }
 
 func init() {
+	cmd.Json = true
+
 	if err := setUp(); err != nil {
 		_ = fmt.Errorf("init failed")
 	}

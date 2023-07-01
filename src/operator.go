@@ -30,10 +30,7 @@ func addOperator(c echo.Context) error {
 	var params nsc.AddOperatorParams // TODO: fill params by api body
 
 	if err := nsc.RunStoreLessAction(&cobra.Command{}, []string{c.FormValue("name")}, &params); err != nil {
-		return c.JSON(400, &SimpleJSONResponse{
-			Status:  "400",
-			Message: err.Error(),
-		})
+		return badRequest(c, err)
 	}
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
@@ -72,12 +69,12 @@ func describeOperator(c echo.Context) error {
 	nsc.Json = true
 	err := operatorCmd.RunE(operatorCmd, []string{c.Param("name")})
 	if err != nil {
-		return err
+		return badRequest(c, err)
 	}
 
 	err = w.Close()
 	if err != nil {
-		return err
+		return badRequest(c, err)
 	}
 
 	var b, _ = io.ReadAll(r)

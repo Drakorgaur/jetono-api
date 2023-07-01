@@ -30,32 +30,16 @@ func init() {
 // @Failure		400			{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500			{object}	string				"Internal error"
 func addUser(c echo.Context) error {
-	if operator := c.Param("operator"); operator == "" {
-		return c.JSON(400, &SimpleJSONResponse{
-			Status:  "400",
-			Message: "operator is required",
-		})
-	} else {
-		nsc.GetConfig().Operator = operator
-	}
-
-	if account := c.Param("account"); account == "" {
-		return c.JSON(400, &SimpleJSONResponse{
-			Status:  "400",
-			Message: "account is required",
-		})
-	} else {
-		nsc.GetConfig().Account = account
-	}
+	nsc.GetConfig().Operator = c.Param("operator")
+	nsc.GetConfig().Account = c.Param("account")
 
 	cmd := nsc.CreateAddUserCmd()
-	err := cmd.Flags().Set("account", nsc.GetConfig().Account)
-	if err != nil {
-		return err
+	if err := cmd.Flags().Set("account", nsc.GetConfig().Account); err != nil {
+		return badRequest(c, err)
 	}
-	err = cmd.RunE(cmd, []string{c.FormValue("name")})
-	if err != nil {
-		return err
+
+	if err := cmd.RunE(cmd, []string{c.FormValue("name")}); err != nil {
+		return badRequest(c, err)
 	}
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
@@ -77,12 +61,12 @@ func listUsers(c echo.Context) error {
 
 	ctx, err := nsc.NewActx(&cobra.Command{}, []string{})
 	if err != nil {
-		return c.JSON(400, err.Error())
+		return badRequest(c, err)
 	}
 
 	entries, err := nsc.ListUsers(ctx.StoreCtx().Store, c.Param("account"))
 	if err != nil {
-		return c.JSON(400, err.Error())
+		return badRequest(c, err)
 	}
 
 	var users []string
@@ -119,30 +103,23 @@ func describeUser(c echo.Context) error {
 	var operatorCmd = lookupCommand(describeCmd, "user")
 
 	var r, w, _ = os.Pipe()
+	defer w.Close()
 
 	old := os.Stdout
 	os.Stdout = w
 
-	nsc.Json = true
-
-	err := operatorCmd.Flags().Lookup("account").Value.Set(c.Param("account"))
-	if err != nil {
-		return err
+	if err := operatorCmd.Flags().Lookup("account").Value.Set(c.Param("account")); err != nil {
+		return badRequest(c, err)
 	}
 
-	err = operatorCmd.RunE(operatorCmd, []string{c.Param("name")})
-
-	if err != nil {
-		return err
+	if err := operatorCmd.RunE(operatorCmd, []string{c.Param("name")}); err != nil {
+		return badRequest(c, err)
 	}
-
-	err = w.Close()
-	if err != nil {
-		return err
-	}
-
-	var b, _ = io.ReadAll(r)
 	os.Stdout = old
 
-	return c.JSONBlob(200, b)
+	if all, err := io.ReadAll(r); err != nil {
+		return badRequest(c, err)
+	} else {
+		return c.JSONBlob(200, all)
+	}
 }
