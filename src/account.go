@@ -62,7 +62,7 @@ func listAccounts(c echo.Context) error {
 	if accounts, err := config.ListAccounts(); err != nil {
 		return badRequest(c, err)
 	} else {
-		return c.JSON(200, accounts)
+		return c.JSON(200, map[string][]string{"accounts": accounts})
 	}
 }
 

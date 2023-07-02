@@ -84,7 +84,7 @@ func listUsers(c echo.Context) error {
 		return c.JSON(200, errors)
 	}
 
-	return c.JSON(200, users)
+	return c.JSON(200, map[string][]string{"users": users})
 }
 
 // @Tags			User

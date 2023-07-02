@@ -47,7 +47,7 @@ func addOperator(c echo.Context) error {
 func listOperators(c echo.Context) error {
 	operators := nsc.GetConfig().ListOperators()
 
-	return c.JSON(200, operators)
+	return c.JSON(200, map[string][]string{"operators": operators})
 }
 
 // @Tags			Operator
