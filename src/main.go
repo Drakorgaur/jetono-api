@@ -3,6 +3,7 @@ package src
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
 	"os"
@@ -50,6 +51,10 @@ func init() {
 func Api() {
 	// Start server
 	e.GET("/docs/*", echoSwagger.WrapHandler)
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
