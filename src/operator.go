@@ -4,8 +4,6 @@ import (
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/spf13/cobra"
-	"io"
-	"os"
 )
 
 func init() {
@@ -61,24 +59,12 @@ func describeOperator(c echo.Context) error {
 	var describeCmd = lookupCommand(nsc.GetRootCmd(), "describe")
 	var operatorCmd = lookupCommand(describeCmd, "operator")
 
-	var r, w, _ = os.Pipe()
+	var r, w, old = captureStdout()
 
-	old := os.Stdout
-	os.Stdout = w
-
-	nsc.Json = true
 	err := operatorCmd.RunE(operatorCmd, []string{c.Param("name")})
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	err = w.Close()
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	var b, _ = io.ReadAll(r)
-	os.Stdout = old
-
-	return c.JSONBlob(200, b)
+	return c.JSONBlob(200, releaseStdoutLock(r, w, old))
 }

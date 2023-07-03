@@ -4,8 +4,6 @@ import (
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/spf13/cobra"
-	"io"
-	"os"
 )
 
 func init() {
