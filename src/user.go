@@ -17,6 +17,8 @@ func init() {
 	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"s", listUsers)
 
 	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"/:name", describeUser)
+
+	GetEchoRoot().GET("creds/operator/:operator/account/:account/"+module+"/:name", generateUser)
 }
 
 // @Tags			User
@@ -89,37 +91,60 @@ func listUsers(c echo.Context) error {
 
 // @Tags			User
 // @Router			/operator/{operator}/account/{account}/user/{name} [get]
-// @Param			name		path	string	true	"Account name"
+// @Param			name		path	string	true	"Username"
 // @Param			account		path	string	true	"Account name"
 // @Param			operator	path	string	true	"Operator name"
 // @Summary		Describes user
 // @Description	Returns json object with user description
 // @Success		200	{object}	UserDescription	"Operator description"
-// @Failure		500	{object}	string				"Internal error"
+// @Failure		500	{object}	string			"Internal error"
 func describeUser(c echo.Context) error {
 	nsc.GetConfig().Operator = c.Param("operator")
 
 	var describeCmd = lookupCommand(nsc.GetRootCmd(), "describe")
 	var operatorCmd = lookupCommand(describeCmd, "user")
 
-	var r, w, _ = os.Pipe()
-
-	old := os.Stdout
-	os.Stdout = w
-
 	if err := operatorCmd.Flags().Lookup("account").Value.Set(c.Param("account")); err != nil {
 		return badRequest(c, err)
 	}
 
+	var r, w, old = captureStdout()
 	if err := operatorCmd.RunE(operatorCmd, []string{c.Param("name")}); err != nil {
 		return badRequest(c, err)
 	}
-	os.Stdout = old
-	w.Close()
 
-	if all, err := io.ReadAll(r); err != nil {
-		return badRequest(c, err)
-	} else {
-		return c.JSONBlob(200, all)
+	return c.JSON(200, string(releaseStdoutLock(r, w, old)))
+}
+
+// @Tags		User
+// @Router		/creds/operator/{operator}/account/{account}/user/{name} [get]
+// @Summary	Generate user credentials
+// @Param			name		path	string	true	"Username"
+// @Param			account		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Description
+// @Success	200	{object}	map[string]string	"Operators list"
+// @Failure	500	{object}	string				"Internal error"
+func generateUser(c echo.Context) error {
+	var generateCmd = lookupCommand(nsc.GetRootCmd(), "generate")
+	var credsCmd = lookupCommand(generateCmd, "creds")
+
+	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
+		return err
 	}
+
+	if err := credsCmd.Flags().Set("account", c.Param("account")); err != nil {
+		return err
+	}
+	if err := credsCmd.Flags().Set("name", c.Param("user")); err != nil {
+		return err
+	}
+
+	var r, w, old = captureStdout()
+	if err := credsCmd.RunE(credsCmd, []string{}); err != nil {
+		releaseStdoutLock(r, w, old)
+		return err
+	}
+
+	return c.JSON(200, map[string]string{"creds": string(releaseStdoutLock(r, w, old))})
 }
