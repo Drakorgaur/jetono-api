@@ -78,9 +78,73 @@ definitions:
       status:
         type: string
     type: object
+  src.UserDescription:
+    properties:
+      iat:
+        type: integer
+      iss:
+        type: string
+      jti:
+        type: string
+      name:
+        type: string
+      nats:
+        properties:
+          data:
+            type: integer
+          payload:
+            type: integer
+          pub:
+            additionalProperties: true
+            type: object
+          sub:
+            additionalProperties: true
+            type: object
+          subs:
+            type: integer
+          type:
+            type: string
+          version:
+            type: integer
+        type: object
+      sub:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
+  /creds/operator/{operator}/account/{account}/user/{name}:
+    get:
+      parameters:
+      - description: Account name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Account name
+        in: path
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operators list
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Generate user credentials
+      tags:
+      - User
   /operator:
     post:
       description: Add an operator to the store
@@ -215,7 +279,7 @@ paths:
         "200":
           description: Operator description
           schema:
-            $ref: '#/definitions/src.AccountDescription'
+            $ref: '#/definitions/src.UserDescription'
         "500":
           description: Internal error
           schema:

@@ -4,6 +4,54 @@
         "contact": {}
     },
     "paths": {
+        "/creds/operator/{operator}/account/{account}/user/{name}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Generate user credentials",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account name",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operators list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/operator": {
             "post": {
                 "description": "Add an operator to the store",
@@ -205,7 +253,7 @@
                     "200": {
                         "description": "Operator description",
                         "schema": {
-                            "$ref": "#/definitions/src.AccountDescription"
+                            "$ref": "#/definitions/src.UserDescription"
                         }
                     },
                     "500": {
@@ -478,6 +526,54 @@
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.UserDescription": {
+            "type": "object",
+            "properties": {
+                "iat": {
+                    "type": "integer"
+                },
+                "iss": {
+                    "type": "string"
+                },
+                "jti": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nats": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "integer"
+                        },
+                        "payload": {
+                            "type": "integer"
+                        },
+                        "pub": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "sub": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "subs": {
+                            "type": "integer"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "sub": {
                     "type": "string"
                 }
             }
