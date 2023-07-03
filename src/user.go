@@ -117,9 +117,9 @@ func describeUser(c echo.Context) error {
 // @Tags		User
 // @Router		/creds/operator/{operator}/account/{account}/user/{name} [get]
 // @Summary	Generate user credentials
-// @Param			name		path	string	true	"Username"
-// @Param			account		path	string	true	"Account name"
-// @Param			operator	path	string	true	"Operator name"
+// @Param		name		path	string	true	"Username"
+// @Param		account		path	string	true	"Account name"
+// @Param		operator	path	string	true	"Operator name"
 // @Description
 // @Success	200	{object}	map[string]string	"Operators list"
 // @Failure	500	{object}	string				"Internal error"
