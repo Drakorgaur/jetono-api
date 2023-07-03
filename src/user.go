@@ -128,20 +128,20 @@ func generateUser(c echo.Context) error {
 	var credsCmd = lookupCommand(generateCmd, "creds")
 
 	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
-		return err
+		return badRequest(c, err)
 	}
 
 	if err := credsCmd.Flags().Set("account", c.Param("account")); err != nil {
-		return err
+		return badRequest(c, err)
 	}
 	if err := credsCmd.Flags().Set("name", c.Param("user")); err != nil {
-		return err
+		return badRequest(c, err)
 	}
 
 	var r, w, old = captureStdout()
 	if err := credsCmd.RunE(credsCmd, []string{}); err != nil {
 		releaseStdoutLock(r, w, old)
-		return err
+		return badRequest(c, err)
 	}
 
 	return c.JSON(200, map[string]string{"creds": string(releaseStdoutLock(r, w, old))})
