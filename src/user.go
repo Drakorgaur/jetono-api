@@ -17,6 +17,8 @@ func init() {
 	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"/:name", describeUser)
 
 	GetEchoRoot().GET("creds/operator/:operator/account/:account/"+module+"/:name", generateUser)
+
+	GetEchoRoot().DELETE("operator/:operator/account/:account/"+module+"/:name", revokeUser)
 }
 
 // @Tags			User
@@ -145,4 +147,34 @@ func generateUser(c echo.Context) error {
 	}
 
 	return c.JSON(200, map[string]string{"creds": string(releaseStdoutLock(r, w, old))})
+}
+
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/user/{name} [delete]
+// @Param			name		path	string	true	"Username"
+// @Param			account		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Summary		Revokes a user
+// @Description	Revokes a user
+// @Success		200	{object}	map[string]string	"Operator description"
+// @Failure		500	{object}	string				"Internal error"
+func revokeUser(c echo.Context) error {
+	var revokeCmd = lookupCommand(nsc.GetRootCmd(), "revocations")
+	var operatorCmd = lookupCommand(revokeCmd, "add-user")
+
+	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
+		return badRequest(c, err)
+	}
+	if err := operatorCmd.Flags().Set("account", c.Param("account")); err != nil {
+		return badRequest(c, err)
+	}
+	if err := operatorCmd.Flags().Set("name", c.Param("name")); err != nil {
+		return badRequest(c, err)
+	}
+
+	if err := operatorCmd.RunE(operatorCmd, []string{}); err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]string{"status": "ok"})
 }
