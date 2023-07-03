@@ -116,7 +116,7 @@ paths:
   /creds/operator/{operator}/account/{account}/user/{name}:
     get:
       parameters:
-      - description: Account name
+      - description: Username
         in: path
         name: name
         required: true
@@ -257,10 +257,42 @@ paths:
       tags:
       - User
   /operator/{operator}/account/{account}/user/{name}:
+    delete:
+      description: Revokes a user
+      parameters:
+      - description: Username
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Account name
+        in: path
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator description
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Revokes a user
+      tags:
+      - User
     get:
       description: Returns json object with user description
       parameters:
-      - description: Account name
+      - description: Username
         in: path
         name: name
         required: true

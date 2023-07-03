@@ -25,7 +25,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account name",
+                        "description": "Username",
                         "name": "name",
                         "in": "path",
                         "required": true
@@ -241,7 +241,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account name",
+                        "description": "Username",
                         "name": "name",
                         "in": "path",
                         "required": true
@@ -266,6 +266,53 @@ const docTemplate = `{
                         "description": "Operator description",
                         "schema": {
                             "$ref": "#/definitions/src.UserDescription"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Revokes a user",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Revokes a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account name",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operator description",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "500": {
