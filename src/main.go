@@ -33,7 +33,7 @@ func init() {
 		storeDir = "/tmp"
 	}
 
-	store.KeyStorePath = "/nsc/keys"
+	store.KeyStorePath = os.Getenv("NKEYS_PATH")
 	config.StoreRoot = "/" + storeDir
 
 	if _, err := os.Stat(config.StoreRoot); os.IsNotExist(err) {
