@@ -2,7 +2,9 @@ package src
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/nats-io/jwt/v2"
 	nsc "github.com/nats-io/nsc/cmd"
+	"github.com/nats-io/nsc/cmd/store"
 	"github.com/spf13/cobra"
 )
 
@@ -125,29 +127,39 @@ func describeUser(c echo.Context) error {
 // @Param		operator	path	string	true	"Operator name"
 // @Description
 // @Success	200	{object}	map[string]string	"Operators list"
+// @Success	404	{object}	map[string]string	"User was not found"
 // @Failure	500	{object}	string				"Internal error"
 func generateUser(c echo.Context) error {
-	var generateCmd = lookupCommand(nsc.GetRootCmd(), "generate")
-	var credsCmd = lookupCommand(generateCmd, "creds")
+	operator := c.Param("operator")
+	account := c.Param("account")
+	user := c.Param("name")
 
-	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
+	s, err := nsc.GetStoreForOperator(operator)
+	if err != nil {
 		return badRequest(c, err)
 	}
 
-	if err := credsCmd.Flags().Set("account", c.Param("account")); err != nil {
-		return badRequest(c, err)
+	entityJwt, err := s.Read(store.Accounts, account, store.Users, store.JwtName(user))
+	if err != nil {
+		return err
 	}
-	if err := credsCmd.Flags().Set("name", c.Param("user")); err != nil {
+
+	uc, err := jwt.DecodeUserClaims(string(entityJwt))
+
+	keyStore := store.NewKeyStore(operator)
+	entityKP, err := keyStore.GetKeyPair(uc.Subject)
+
+	if entityKP == nil {
+		return c.JSON(404, map[string]string{"error": "user was not found - please specify it"})
+	}
+
+	d, err := nsc.GenerateConfig(s, account, user, entityKP)
+
+	if err != nil {
 		return badRequest(c, err)
 	}
 
-	var r, w, old = captureStdout()
-	if err := credsCmd.RunE(credsCmd, []string{}); err != nil {
-		releaseStdoutLock(r, w, old)
-		return badRequest(c, err)
-	}
-
-	return c.JSON(200, map[string]string{"creds": string(releaseStdoutLock(r, w, old))})
+	return c.JSON(200, map[string]string{"creds": string(d)})
 }
 
 // @Tags			User
