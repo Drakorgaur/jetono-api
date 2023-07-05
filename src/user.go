@@ -99,21 +99,22 @@ func listUsers(c echo.Context) error {
 // @Success		200	{object}	UserDescription	"Operator description"
 // @Failure		500	{object}	string			"Internal error"
 func describeUser(c echo.Context) error {
-	nsc.GetConfig().Operator = c.Param("operator")
-
-	var describeCmd = lookupCommand(nsc.GetRootCmd(), "describe")
-	var operatorCmd = lookupCommand(describeCmd, "user")
-
-	if err := operatorCmd.Flags().Lookup("account").Value.Set(c.Param("account")); err != nil {
+	store, err := nsc.GetStoreForOperator(c.Param("operator"))
+	if err != nil {
 		return badRequest(c, err)
 	}
 
-	var r, w, old = captureStdout()
-	if err := operatorCmd.RunE(operatorCmd, []string{c.Param("name")}); err != nil {
+	claim, err := store.ReadRawUserClaim(c.Param("account"), c.Param("name"))
+	if err != nil {
 		return badRequest(c, err)
 	}
 
-	return c.JSON(200, string(releaseStdoutLock(r, w, old)))
+	body, err := bodyAsJson(claim)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSONBlob(200, body)
 }
 
 // @Tags		User
