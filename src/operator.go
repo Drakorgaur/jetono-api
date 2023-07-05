@@ -56,15 +56,23 @@ func listOperators(c echo.Context) error {
 // @Success		200	{object}	OperatorDescription	"Operator description"
 // @Failure		500	{object}	string				"Internal error"
 func describeOperator(c echo.Context) error {
-	var describeCmd = lookupCommand(nsc.GetRootCmd(), "describe")
-	var operatorCmd = lookupCommand(describeCmd, "operator")
-
-	var r, w, old = captureStdout()
-
-	err := operatorCmd.RunE(operatorCmd, []string{c.Param("name")})
+	s, err := nsc.GetStoreForOperator(c.Param("name"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	return c.JSONBlob(200, releaseStdoutLock(r, w, old))
+	claim, err := s.ReadRawOperatorClaim()
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	body, err := bodyAsJson(claim)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSONBlob(
+		200,
+		body,
+	)
 }
