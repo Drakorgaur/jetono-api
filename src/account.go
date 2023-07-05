@@ -3,8 +3,6 @@ package src
 import (
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
-	"io"
-	"os"
 )
 
 func init() {
@@ -75,31 +73,20 @@ func listAccounts(c echo.Context) error {
 // @Success		200	{object}	AccountDescription	"Operator description"
 // @Failure		500	{object}	string				"Internal error"
 func describeAccount(c echo.Context) error {
-	config := nsc.GetConfig()
-
-	config.Operator = c.QueryParam("operator")
-
-	describeCmd := lookupCommand(nsc.GetRootCmd(), "describe")
-	accountCmd := lookupCommand(describeCmd, "account")
-
-	var r, w, _ = os.Pipe()
-
-	old := os.Stdout
-	os.Stdout = w
-
-	nsc.Json = true
-	err := accountCmd.RunE(accountCmd, []string{c.Param("name")})
+	store, err := nsc.GetStoreForOperator(c.Param("operator"))
 	if err != nil {
-		return err
+		return badRequest(c, err)
 	}
 
-	err = w.Close()
+	claim, err := store.ReadRawAccountClaim(c.Param("name"))
 	if err != nil {
-		return err
+		return badRequest(c, err)
 	}
 
-	var b, _ = io.ReadAll(r)
-	os.Stdout = old
+	body, err := bodyAsJson(claim)
+	if err != nil {
+		return badRequest(c, err)
+	}
 
-	return c.JSONBlob(200, b)
+	return c.JSONBlob(200, body)
 }
