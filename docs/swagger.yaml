@@ -234,6 +234,57 @@ paths:
         name: operator
         required: true
         type: string
+      - description: 'the amount of time the default permission is valid (global)
+          - [#ms(millis) | #s(econds) | m(inutes) | h(ours)] - Default is no time
+          limit.'
+        in: formData
+        name: response-ttl
+        type: string
+      - description: '%s to limit how often a client can publish to reply subjects
+          [with an optional count, --allow-pub-response=n] (global)'
+        in: formData
+        name: allow-pub-response
+        type: string
+      - description: add publish %s - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: allow-pub
+        type: string
+      - description: add publish and subscribe %s - comma separated list or option
+          can be specified multiple times
+        in: formData
+        name: allow-pubsub
+        type: string
+      - description: add subscribe %s - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: allow-sub
+        type: string
+      - description: add deny publish %s - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: deny-pub
+        type: string
+      - description: add deny publish and subscribe %s - comma separated list or option
+          can be specified multiple times
+        in: formData
+        name: deny-pubsub
+        type: string
+      - description: add deny subscribe %s - comma separated list or option can be
+          specified multiple times
+        in: formData
+        name: deny-sub
+        type: string
+      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
+          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
+        in: formData
+        name: start
+        type: string
+      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
+          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
+        in: formData
+        name: expiry
+        type: string
       responses:
         "200":
           description: Account added
@@ -386,7 +437,7 @@ paths:
         required: true
         type: string
       - description: Operator name
-        in: query
+        in: path
         name: operator
         required: true
         type: string

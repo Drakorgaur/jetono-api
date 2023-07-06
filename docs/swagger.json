@@ -182,6 +182,66 @@
                         "name": "operator",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "the amount of time the default permission is valid (global) - [#ms(millis) | #s(econds) | m(inutes) | h(ours)] - Default is no time limit.",
+                        "name": "response-ttl",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "%s to limit how often a client can publish to reply subjects [with an optional count, --allow-pub-response=n] (global)",
+                        "name": "allow-pub-response",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add publish %s - comma separated list or option can be specified multiple times",
+                        "name": "allow-pub",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add publish and subscribe %s - comma separated list or option can be specified multiple times",
+                        "name": "allow-pubsub",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add subscribe %s - comma separated list or option can be specified multiple times",
+                        "name": "allow-sub",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add deny publish %s - comma separated list or option can be specified multiple times",
+                        "name": "deny-pub",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add deny publish and subscribe %s - comma separated list or option can be specified multiple times",
+                        "name": "deny-pubsub",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add deny subscribe %s - comma separated list or option can be specified multiple times",
+                        "name": "deny-sub",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
+                        "name": "start",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
+                        "name": "expiry",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -412,7 +472,7 @@
                         "type": "string",
                         "description": "Operator name",
                         "name": "operator",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
