@@ -55,6 +55,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "404": {
+                        "description": "User was not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal error",
                         "schema": {
@@ -78,6 +87,36 @@ const docTemplate = `{
                         "name": "name",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "generate a signing key with the operator",
+                        "name": "generate-signing-key",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "generate system account with the operator (if specified will be signed with signing key)",
+                        "name": "sys",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "on import, overwrite existing when already present",
+                        "name": "force",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
+                        "name": "start",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
+                        "name": "expiry",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
