@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/cobra"
 )
 
 func initInfo(value string) {
@@ -44,4 +45,15 @@ func bodyAsJson(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("error formatting json: %v", err)
 	}
 	return j.Bytes(), nil
+}
+
+func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []string) error {
+	for _, flag := range flags {
+		if value := getFlag(flag); value == "" {
+			continue
+		} else if err := cmd.Flags().Set(flag, value); err != nil {
+			return err
+		}
+	}
+	return nil
 }
