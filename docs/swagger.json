@@ -568,6 +568,199 @@
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Updates an account and returns json with status ok if successful",
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Updates an account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "add tags for user - comma separated list or option can be specified multiple times",
+                        "name": "tag",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "remove tag - comma separated list or option can be specified multiple times",
+                        "name": "rm-tag",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum active connections for the account (-1 is unlimited)",
+                        "name": "conns",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum active leaf node connections for the account (-1 is unlimited)",
+                        "name": "leaf-conns",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum data in bytes for the account (-1 is unlimited)",
+                        "name": "data",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum number of exports for the account (-1 is unlimited)",
+                        "name": "exports",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum number of imports for the account (-1 is unlimited)",
+                        "name": "imports",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum message payload in bytes for the account (-1 is unlimited)",
+                        "name": "payload",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set maximum subscription for the account (-1 is unlimited)",
+                        "name": "subscriptions",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "exports can contain wildcards",
+                        "name": "wildcard-exports",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "require user jwt to not be bearer token",
+                        "name": "disallow-bearer",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "remove signing key - comma separated list or option can be specified multiple times",
+                        "name": "rm-sk",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description for this account",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Link for more info on this account",
+                        "name": "info-url",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: replication tier (0 creates a configuration that applies to all assets) ",
+                        "name": "js-tier",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: remove replication limits for the specified tier (0 is the global tier) this flag is exclusive of all other js flags",
+                        "name": "rm-js-tier",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set maximum memory storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
+                        "name": "js-mem-storage",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set maximum disk storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
+                        "name": "js-disk-storage",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set maximum streams for the account (-1 is unlimited)",
+                        "name": "js-streams",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set maximum consumer for the account (-1 is unlimited)",
+                        "name": "js-consumer",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set maximum size of a memory stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
+                        "name": "js-max-mem-stream",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set maximum size of a disk stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
+                        "name": "js-max-disk-stream",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set whether max stream is required when creating a stream",
+                        "name": "js-max-bytes-required",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JetStream: set number of maximum acks that can be pending for a consumer in the account",
+                        "name": "js-max-ack-pending",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "account to edit",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "disables all JetStream limits in the account by deleting any limits",
+                        "name": "js-disable",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status ok",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/operator/{operator}/accounts": {

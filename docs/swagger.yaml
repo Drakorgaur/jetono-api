@@ -510,6 +510,148 @@ paths:
       summary: Describes an account
       tags:
       - Account
+    patch:
+      description: Updates an account and returns json with status ok if successful
+      parameters:
+      - description: Account name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Operator name
+        in: path
+        name: operator
+        required: true
+        type: string
+      - description: add tags for user - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: tag
+        type: string
+      - description: remove tag - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: rm-tag
+        type: string
+      - description: set maximum active connections for the account (-1 is unlimited)
+        in: formData
+        name: conns
+        type: string
+      - description: set maximum active leaf node connections for the account (-1
+          is unlimited)
+        in: formData
+        name: leaf-conns
+        type: string
+      - description: set maximum data in bytes for the account (-1 is unlimited)
+        in: formData
+        name: data
+        type: string
+      - description: set maximum number of exports for the account (-1 is unlimited)
+        in: formData
+        name: exports
+        type: string
+      - description: set maximum number of imports for the account (-1 is unlimited)
+        in: formData
+        name: imports
+        type: string
+      - description: set maximum message payload in bytes for the account (-1 is unlimited)
+        in: formData
+        name: payload
+        type: string
+      - description: set maximum subscription for the account (-1 is unlimited)
+        in: formData
+        name: subscriptions
+        type: string
+      - description: exports can contain wildcards
+        in: formData
+        name: wildcard-exports
+        type: string
+      - description: require user jwt to not be bearer token
+        in: formData
+        name: disallow-bearer
+        type: string
+      - description: remove signing key - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: rm-sk
+        type: string
+      - description: Description for this account
+        in: formData
+        name: description
+        type: string
+      - description: Link for more info on this account
+        in: formData
+        name: info-url
+        type: string
+      - description: 'JetStream: replication tier (0 creates a configuration that
+          applies to all assets) '
+        in: formData
+        name: js-tier
+        type: string
+      - description: 'JetStream: remove replication limits for the specified tier
+          (0 is the global tier) this flag is exclusive of all other js flags'
+        in: formData
+        name: rm-js-tier
+        type: string
+      - description: 'JetStream: set maximum memory storage in bytes for the account
+          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
+        in: formData
+        name: js-mem-storage
+        type: string
+      - description: 'JetStream: set maximum disk storage in bytes for the account
+          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
+        in: formData
+        name: js-disk-storage
+        type: string
+      - description: 'JetStream: set maximum streams for the account (-1 is unlimited)'
+        in: formData
+        name: js-streams
+        type: string
+      - description: 'JetStream: set maximum consumer for the account (-1 is unlimited)'
+        in: formData
+        name: js-consumer
+        type: string
+      - description: 'JetStream: set maximum size of a memory stream for the account
+          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
+        in: formData
+        name: js-max-mem-stream
+        type: string
+      - description: 'JetStream: set maximum size of a disk stream for the account
+          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
+        in: formData
+        name: js-max-disk-stream
+        type: string
+      - description: 'JetStream: set whether max stream is required when creating
+          a stream'
+        in: formData
+        name: js-max-bytes-required
+        type: string
+      - description: 'JetStream: set number of maximum acks that can be pending for
+          a consumer in the account'
+        in: formData
+        name: js-max-ack-pending
+        type: string
+      - description: account to edit
+        in: formData
+        name: name
+        type: string
+      - description: disables all JetStream limits in the account by deleting any
+          limits
+        in: formData
+        name: js-disable
+        type: string
+      responses:
+        "200":
+          description: Status ok
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Updates an account
+      tags:
+      - Account
   /operator/{operator}/accounts:
     get:
       description: Returns json list of existing accounts for given operator
