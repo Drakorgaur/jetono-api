@@ -41,6 +41,10 @@ func addAccount(c echo.Context) error {
 	var addCmd = lookupCommand(nsc.GetRootCmd(), "add")
 	var addAccountCmd = lookupCommand(addCmd, "account")
 
+	if err, flag := raiseForRequiredFlags(c.FormValue, "name"); err != nil {
+		return c.JSON(400, map[string]string{"code": "400", "message": "required form data no filled", "field": flag})
+	}
+
 	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
 		return err
 	}
@@ -125,8 +129,8 @@ func describeAccount(c echo.Context) error {
 
 // @Tags			Account
 // @Router			/operator/{operator}/account/{name} [patch]
-// @Param			name		path	string	true	"Account name"
-// @Param			operator	path	string	true	"Operator name"
+// @Param			name					path		string	true	"Account name"
+// @Param			operator				path		string	true	"Operator name"
 // @Param			tag						formData	string	false	"add tags for user - comma separated list or option can be specified multiple times"
 // @Param			rm-tag					formData	string	false	"remove tag - comma separated list or option can be specified multiple times"
 // @Param			conns					formData	string	false	"set maximum active connections for the account (-1 is unlimited)"

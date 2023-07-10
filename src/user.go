@@ -39,6 +39,10 @@ func addUser(c echo.Context) error {
 	nsc.GetConfig().Operator = c.Param("operator")
 	nsc.GetConfig().Account = c.Param("account")
 
+	if err, flag := raiseForRequiredFlags(c.FormValue, "name"); err != nil {
+		return c.JSON(400, map[string]string{"code": "400", "message": "required form data no filled", "field": flag})
+	}
+
 	cmd := nsc.CreateAddUserCmd()
 	if err := cmd.Flags().Set("account", nsc.GetConfig().Account); err != nil {
 		return badRequest(c, err)

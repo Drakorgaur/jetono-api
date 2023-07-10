@@ -34,6 +34,10 @@ func addOperator(c echo.Context) error {
 	var addCmd = lookupCommand(nsc.GetRootCmd(), "add")
 	var addOperatorCmd = lookupCommand(addCmd, "operator")
 
+	if err, flag := raiseForRequiredFlags(c.FormValue, "name"); err != nil {
+		return c.JSON(400, map[string]string{"code": "400", "message": "required form data no filled", "field": flag})
+	}
+
 	err := setFlagsIfInForm(addOperatorCmd, c.FormValue, []string{
 		// "url", is not supported yet.
 		"generate-signing-key",

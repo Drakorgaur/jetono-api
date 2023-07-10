@@ -57,3 +57,12 @@ func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []s
 	}
 	return nil
 }
+
+func raiseForRequiredFlags(getFlag func(string) string, flags ...string) (error, string) {
+	for _, flag := range flags {
+		if getFlag(flag) == "" {
+			return fmt.Errorf("required form data is not set"), flag
+		}
+	}
+	return nil, ""
+}
