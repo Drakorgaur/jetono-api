@@ -220,6 +220,63 @@ paths:
       summary: Describes an operator
       tags:
       - Operator
+    patch:
+      description: Updates an operator and returns json with status ok if successful
+      parameters:
+      - description: Operator name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: add tags for user - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: tag
+        type: string
+      - description: remove tag - comma separated list or option can be specified
+          multiple times
+        in: formData
+        name: rm-tag
+        type: string
+      - description: set account jwt server url for nsc sync (only http/https/nats
+          urls supported if updating with nsc)
+        in: formData
+        name: account-jwt-server-url
+        type: string
+      - description: set system account by account by public key or name
+        in: formData
+        name: system-account
+        type: string
+      - description: add an operator service url - comma separated list or option
+          can be specified multiple times
+        in: formData
+        name: service-url
+        type: string
+      - description: remove an operator service url - comma separated list or option
+          can be specified multiple times
+        in: formData
+        name: rm-service-url
+        type: string
+      - description: require accounts/user to be signed with a signing key
+        in: formData
+        name: require-signing-keys
+        type: string
+      - description: clear account server url
+        in: formData
+        name: rm-account-jwt-server-url
+        type: string
+      responses:
+        "200":
+          description: Status ok
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Updates an operator
+      tags:
+      - Operator
   /operator/{operator}/account:
     post:
       description: Add an account with given operator to the store

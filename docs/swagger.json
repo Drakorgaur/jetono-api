@@ -159,6 +159,84 @@
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Updates an operator and returns json with status ok if successful",
+                "tags": [
+                    "Operator"
+                ],
+                "summary": "Updates an operator",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "add tags for user - comma separated list or option can be specified multiple times",
+                        "name": "tag",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "remove tag - comma separated list or option can be specified multiple times",
+                        "name": "rm-tag",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set account jwt server url for nsc sync (only http/https/nats urls supported if updating with nsc)",
+                        "name": "account-jwt-server-url",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "set system account by account by public key or name",
+                        "name": "system-account",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "add an operator service url - comma separated list or option can be specified multiple times",
+                        "name": "service-url",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "remove an operator service url - comma separated list or option can be specified multiple times",
+                        "name": "rm-service-url",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "require accounts/user to be signed with a signing key",
+                        "name": "require-signing-keys",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "clear account server url",
+                        "name": "rm-account-jwt-server-url",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status ok",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/operator/{operator}/account": {
