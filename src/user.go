@@ -224,8 +224,8 @@ func revokeUser(c echo.Context) error {
 // @Param			deny-sub			formData	string	false	"add deny ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple	times, typeName))"
 // @Param			rm-response-perms	formData	string	false	"remove sresponse ssettings sfrom s%s, typeName))"
 // @Param			rm					formData	string	false	"remove spublish/subscribe sand sdeny s%s - comma separated	list or	option can be specified multiple times, typeName))"
-// @Summary		Updates an operator
-// @Description	Updates an operator and returns json with status ok if successful
+// @Summary		Updates an user
+// @Description	Updates an user and returns json with status ok if successful
 // @Success		200	{object}	SimpleJSONResponse	"Status ok"
 // @Failure		500	{object}	string				"Internal error"
 func updateUser(c echo.Context) error {

@@ -498,11 +498,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "description": "Updates an operator and returns json with status ok if successful",
+                "description": "Updates an user and returns json with status ok if successful",
                 "tags": [
                     "User"
                 ],
-                "summary": "Updates an operator",
+                "summary": "Updates an user",
                 "parameters": [
                     {
                         "type": "string",

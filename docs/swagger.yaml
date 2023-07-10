@@ -454,7 +454,7 @@ paths:
       tags:
       - User
     patch:
-      description: Updates an operator and returns json with status ok if successful
+      description: Updates an user and returns json with status ok if successful
       parameters:
       - description: Username
         in: path
@@ -598,7 +598,7 @@ paths:
           description: Internal error
           schema:
             type: string
-      summary: Updates an operator
+      summary: Updates an user
       tags:
       - User
   /operator/{operator}/account/{account}/users:
