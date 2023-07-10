@@ -13,6 +13,8 @@ func init() {
 	GetEchoRoot().GET("operators", listOperators)
 
 	GetEchoRoot().GET("operator/:name", describeOperator)
+
+	GetEchoRoot().PATCH("operator/:name", updateOperator)
 }
 
 // @Tags			Operator
@@ -93,4 +95,54 @@ func describeOperator(c echo.Context) error {
 		200,
 		body,
 	)
+}
+
+// @Tags			Operator
+// @Router			/operator/{name} [patch]
+// @Param			name						path		string	true	"Operator name"
+// @Param			tag							formData	string	false	"add tags for user - comma separated list or option can be specified multiple times"
+// @Param			rm-tag						formData	string	false	"remove tag - comma separated list or option can be specified multiple times"
+// @Param			account-jwt-server-url		formData	string	false	"set account jwt server url for nsc sync (only http/https/nats urls supported if updating with nsc)"
+// @Param			system-account				formData	string	false	"set system account by account by public key or name"
+// @Param			service-url					formData	string	false	"add an operator service url - comma separated list or option can be specified multiple times"
+// @Param			rm-service-url				formData	string	false	"remove an operator service url - comma separated list or option can be specified multiple times"
+// @Param			require-signing-keys		formData	string	false	"require accounts/user to be signed with a signing key"
+// @Param			rm-account-jwt-server-url	formData	string	false	"clear account server url"
+// @Summary		Updates an operator
+// @Description	Updates an operator and returns json with status ok if successful
+// @Success		200	{object}	SimpleJSONResponse	"Status ok"
+// @Failure		500	{object}	string				"Internal error"
+func updateOperator(c echo.Context) error {
+	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
+	var updateOperatorCmd = lookupCommand(updateCmd, "operator")
+
+	if err := nsc.GetConfig().SetOperator(c.Param("name")); err != nil {
+		return badRequest(c, err)
+	}
+
+	err := setFlagsIfInForm(updateOperatorCmd, c.FormValue, []string{
+		"tag",
+		"rm-tag",
+		"account-jwt-server-url",
+		"system-account",
+		"service-url",
+		"rm-service-url",
+		"require-signing-keys",
+		"rm-account-jwt-server-url",
+		//
+		"start",
+		"expiry",
+	})
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	if err := updateOperatorCmd.RunE(updateOperatorCmd, []string{c.Param("name")}); err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, &SimpleJSONResponse{
+		Status:  "200",
+		Message: "Operator updated",
+	})
 }
