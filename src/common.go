@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func initInfo(value string) {
@@ -51,8 +52,14 @@ func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []s
 	for _, flag := range flags {
 		if value := getFlag(flag); value == "" {
 			continue
-		} else if err := cmd.Flags().Set(flag, value); err != nil {
-			return err
+		} else {
+			f := cmd.Flag(flag)
+			f.Changed = true
+			if val, ok := f.Value.(pflag.SliceValue); ok {
+				_ = val.Replace([]string{value})
+			} else {
+				_ = f.Value.Set(value)
+			}
 		}
 	}
 	return nil
