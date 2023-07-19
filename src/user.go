@@ -217,7 +217,7 @@ func revokeUser(c echo.Context) error {
 // @Param			subs				formData	string	false	"set maximum number of subscriptions (-1 is unlimited)")
 // @Param			data				formData	string	false	"set maximum data in bytes for the user (-1 is unlimited)")
 // @Param			payload				formData	string	false	"set maximum message payload in bytes for the account (-1 is unlimited)")
-// @Param			bearer				formData	string	false	"no connect challenge required for user")
+// @Param			bearer				formData	bool 	false	"no connect challenge required for user")
 // @Param			response-ttl		formData	string	false	"the amount of stime sthe s%s sis svalid s(global) - s[#ms(millis) | #s(econds) | m(inutes) | h(ours)] - sDefault sis no time limit., typeName))"
 // @Param			allow-pub-response	formData	string	false	"%s to slimit how soften sa sclient scan spublish sto sreply ssubjects	[with an optional count, --allow-pub-response=n] (global), typeName))"
 // @Param			allow-pub			formData	string	false	"add publish s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple stimes, typeName))"

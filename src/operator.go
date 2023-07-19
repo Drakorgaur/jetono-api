@@ -110,7 +110,7 @@ func describeOperator(c echo.Context) error {
 // @Param			system-account				formData	string	false	"set system account by account by public key or name"
 // @Param			service-url					formData	string	false	"add an operator service url - comma separated list or option can be specified multiple times"
 // @Param			rm-service-url				formData	string	false	"remove an operator service url - comma separated list or option can be specified multiple times"
-// @Param			require-signing-keys		formData	string	false	"require accounts/user to be signed with a signing key"
+// @Param			require-signing-keys		formData	bool    false	"require accounts/user to be signed with a signing key"
 // @Param			rm-account-jwt-server-url	formData	string	false	"clear account server url"
 // @Summary		Updates an operator
 // @Description	Updates an operator and returns json with status ok if successful

@@ -140,8 +140,8 @@ func describeAccount(c echo.Context) error {
 // @Param			imports					formData	string	false	"set maximum number of imports for the account (-1 is unlimited)"
 // @Param			payload					formData	string	false	"set maximum message payload in bytes for the account (-1 is unlimited)"
 // @Param			subscriptions			formData	string	false	"set maximum subscription for the account (-1 is unlimited)"
-// @Param			wildcard-exports		formData	string	false	"exports can contain wildcards"
-// @Param			disallow-bearer			formData	string	false	"require user jwt to not be bearer token"
+// @Param			wildcard-exports		formData	bool	false	"exports can contain wildcards"
+// @Param			disallow-bearer			formData	bool	false	"require user jwt to not be bearer token"
 // @Param			rm-sk					formData	string	false	"remove signing key - comma separated list or option can be specified multiple times"
 // @Param			description				formData	string	false	"Description for this account"
 // @Param			info-url				formData	string	false	"Link for more info on this account"
@@ -156,7 +156,7 @@ func describeAccount(c echo.Context) error {
 // @Param			js-max-bytes-required	formData	string	false	"JetStream: set whether max stream is required when creating a stream"
 // @Param			js-max-ack-pending		formData	string	false	"JetStream: set number of maximum acks that can be pending for a consumer in the account"
 // @Param			name					formData	string	false	"account to edit"
-// @Param			js-disable				formData	string	false	"disables all JetStream limits in the account by deleting any limits"
+// // @Param			js-disable				formData	string	false	"disables all JetStream limits in the account by deleting any limits"
 // @Summary		Updates an account
 // @Description	Updates an account and returns json with status ok if successful
 // @Success		200	{object}	SimpleJSONResponse	"Status ok"
@@ -184,7 +184,7 @@ func updateAccount(c echo.Context) error {
 		"js-max-disk-stream",
 		"js-max-bytes-required",
 		"js-max-ack-pending",
-		"js-disable",
+		// "js-disable",
 	})
 
 	if err != nil {
