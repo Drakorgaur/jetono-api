@@ -223,7 +223,7 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "type": "string",
+                        "type": "boolean",
                         "description": "require accounts/user to be signed with a signing key",
                         "name": "require-signing-keys",
                         "in": "formData"
@@ -610,7 +610,7 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "type": "string",
+                        "type": "boolean",
                         "description": "no connect challenge required for user",
                         "name": "bearer",
                         "in": "formData"
@@ -848,13 +848,13 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "type": "string",
+                        "type": "boolean",
                         "description": "exports can contain wildcards",
                         "name": "wildcard-exports",
                         "in": "formData"
                     },
                     {
-                        "type": "string",
+                        "type": "boolean",
                         "description": "require user jwt to not be bearer token",
                         "name": "disallow-bearer",
                         "in": "formData"
@@ -941,12 +941,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "account to edit",
                         "name": "name",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "disables all JetStream limits in the account by deleting any limits",
-                        "name": "js-disable",
                         "in": "formData"
                     }
                 ],
