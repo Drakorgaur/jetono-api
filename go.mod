@@ -4,9 +4,12 @@ go 1.20
 
 require (
 	github.com/labstack/echo/v4 v4.10.2
+	github.com/nats-io/jwt/v2 v2.4.1
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
 	github.com/spf13/cobra v0.0.3
+	github.com/spf13/pflag v1.0.5
 	github.com/swaggo/echo-swagger v1.4.0
+	github.com/swaggo/swag v1.16.1
 )
 
 require (
@@ -42,7 +45,6 @@ require (
 	github.com/nats-io/cliprompts/v2 v2.0.0-20191226174129-372d79b36768 // indirect
 	github.com/nats-io/jsm.go v0.0.33 // indirect
 	github.com/nats-io/jwt v1.2.3-0.20210314221642-a826c77dc9d2 // indirect
-	github.com/nats-io/jwt/v2 v2.4.1 // indirect
 	github.com/nats-io/nats.go v1.16.0 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
@@ -50,9 +52,7 @@ require (
 	github.com/russross/blackfriday v1.5.2 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/swag v1.16.1 // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
