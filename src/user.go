@@ -1,6 +1,7 @@
 package src
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/nats-io/jwt/v2"
 	nsc "github.com/nats-io/nsc/cmd"
@@ -107,12 +108,12 @@ func listUsers(c echo.Context) error {
 // @Success		200	{object}	UserDescription	"Operator description"
 // @Failure		500	{object}	string			"Internal error"
 func describeUser(c echo.Context) error {
-	store, err := nsc.GetStoreForOperator(c.Param("operator"))
+	s, err := nsc.GetStoreForOperator(c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	claim, err := store.ReadRawUserClaim(c.Param("account"), c.Param("name"))
+	claim, err := s.ReadRawUserClaim(c.Param("account"), c.Param("name"))
 	if err != nil {
 		return badRequest(c, err)
 	}
@@ -123,6 +124,35 @@ func describeUser(c echo.Context) error {
 	}
 
 	return c.JSONBlob(200, body)
+}
+
+func GetUserCreds(operator string, account string, user string) ([]byte, error) {
+	s, err := nsc.GetStoreForOperator(operator)
+	if err != nil {
+		return nil, err
+	}
+
+	entityJwt, err := s.Read(store.Accounts, account, store.Users, store.JwtName(user))
+	if err != nil {
+		return nil, err
+	}
+
+	uc, err := jwt.DecodeUserClaims(string(entityJwt))
+
+	keyStore := store.NewKeyStore(operator)
+	entityKP, err := keyStore.GetKeyPair(uc.Subject)
+
+	if entityKP == nil {
+		return nil, fmt.Errorf("user was not found - please specify it")
+	}
+
+	d, err := nsc.GenerateConfig(s, account, user, entityKP)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }
 
 // @Tags		User
@@ -136,31 +166,7 @@ func describeUser(c echo.Context) error {
 // @Success	404	{object}	map[string]string	"User was not found"
 // @Failure	500	{object}	string				"Internal error"
 func generateUser(c echo.Context) error {
-	operator := c.Param("operator")
-	account := c.Param("account")
-	user := c.Param("name")
-
-	s, err := nsc.GetStoreForOperator(operator)
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	entityJwt, err := s.Read(store.Accounts, account, store.Users, store.JwtName(user))
-	if err != nil {
-		return err
-	}
-
-	uc, err := jwt.DecodeUserClaims(string(entityJwt))
-
-	keyStore := store.NewKeyStore(operator)
-	entityKP, err := keyStore.GetKeyPair(uc.Subject)
-
-	if entityKP == nil {
-		return c.JSON(404, map[string]string{"error": "user was not found - please specify it"})
-	}
-
-	d, err := nsc.GenerateConfig(s, account, user, entityKP)
-
+	d, err := GetUserCreds(c.Param("operator"), c.Param("account"), c.Param("user"))
 	if err != nil {
 		return badRequest(c, err)
 	}
