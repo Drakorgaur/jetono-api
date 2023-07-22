@@ -113,6 +113,66 @@ definitions:
 info:
   contact: {}
 paths:
+  /bind:
+    get:
+      description: Returns json object with context
+      parameters:
+      - description: Account name
+        in: query
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator description
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: read context bound to account
+      tags:
+      - Account
+    post:
+      description: Returns json with confirmation
+      parameters:
+      - description: Account name
+        in: formData
+        name: account
+        required: true
+        type: string
+      - description: Operator name
+        in: formData
+        name: operator
+        required: true
+        type: string
+      - description: Operator name
+        in: formData
+        name: servers
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Operator description
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Bind context to account
+      tags:
+      - Account
   /creds/operator/{operator}/account/{account}/user/{name}:
     get:
       parameters:

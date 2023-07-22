@@ -132,40 +132,42 @@ func describeAccount(c echo.Context) error {
 	return c.JSONBlob(200, body)
 }
 
-// @Tags			Account
-// @Router			/operator/{operator}/account/{name} [patch]
-// @Param			name					path		string	true	"Account name"
-// @Param			operator				path		string	true	"Operator name"
-// @Param			tag						formData	string	false	"add tags for user - comma separated list or option can be specified multiple times"
-// @Param			rm-tag					formData	string	false	"remove tag - comma separated list or option can be specified multiple times"
-// @Param			conns					formData	string	false	"set maximum active connections for the account (-1 is unlimited)"
-// @Param			leaf-conns				formData	string	false	"set maximum active leaf node connections for the account (-1 is unlimited)"
-// @Param			data					formData	string	false	"set maximum data in bytes for the account (-1 is unlimited)"
-// @Param			exports					formData	string	false	"set maximum number of exports for the account (-1 is unlimited)"
-// @Param			imports					formData	string	false	"set maximum number of imports for the account (-1 is unlimited)"
-// @Param			payload					formData	string	false	"set maximum message payload in bytes for the account (-1 is unlimited)"
-// @Param			subscriptions			formData	string	false	"set maximum subscription for the account (-1 is unlimited)"
-// @Param			wildcard-exports		formData	bool	false	"exports can contain wildcards"
-// @Param			disallow-bearer			formData	bool	false	"require user jwt to not be bearer token"
-// @Param			rm-sk					formData	string	false	"remove signing key - comma separated list or option can be specified multiple times"
-// @Param			description				formData	string	false	"Description for this account"
-// @Param			info-url				formData	string	false	"Link for more info on this account"
-// @Param			js-tier					formData	string	false	"JetStream: replication tier (0 creates a configuration that applies to all assets) "
-// @Param			rm-js-tier				formData	string	false	"JetStream: remove replication limits for the specified tier (0 is the global tier) this flag is exclusive of all other js flags"
-// @Param			js-mem-storage			formData	string	false	"JetStream: set maximum memory storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
-// @Param			js-disk-storage			formData	string	false	"JetStream: set maximum disk storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
-// @Param			js-streams				formData	string	false	"JetStream: set maximum streams for the account (-1 is unlimited)"
-// @Param			js-consumer				formData	string	false	"JetStream: set maximum consumer for the account (-1 is unlimited)"
-// @Param			js-max-mem-stream		formData	string	false	"JetStream: set maximum size of a memory stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
-// @Param			js-max-disk-stream		formData	string	false	"JetStream: set maximum size of a disk stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
-// @Param			js-max-bytes-required	formData	string	false	"JetStream: set whether max stream is required when creating a stream"
-// @Param			js-max-ack-pending		formData	string	false	"JetStream: set number of maximum acks that can be pending for a consumer in the account"
-// @Param			name					formData	string	false	"account to edit"
+//	@Tags			Account
+//	@Router			/operator/{operator}/account/{name} [patch]
+//	@Param			name					path		string	true	"Account name"
+//	@Param			operator				path		string	true	"Operator name"
+//	@Param			tag						formData	string	false	"add tags for user - comma separated list or option can be specified multiple times"
+//	@Param			rm-tag					formData	string	false	"remove tag - comma separated list or option can be specified multiple times"
+//	@Param			conns					formData	string	false	"set maximum active connections for the account (-1 is unlimited)"
+//	@Param			leaf-conns				formData	string	false	"set maximum active leaf node connections for the account (-1 is unlimited)"
+//	@Param			data					formData	string	false	"set maximum data in bytes for the account (-1 is unlimited)"
+//	@Param			exports					formData	string	false	"set maximum number of exports for the account (-1 is unlimited)"
+//	@Param			imports					formData	string	false	"set maximum number of imports for the account (-1 is unlimited)"
+//	@Param			payload					formData	string	false	"set maximum message payload in bytes for the account (-1 is unlimited)"
+//	@Param			subscriptions			formData	string	false	"set maximum subscription for the account (-1 is unlimited)"
+//	@Param			wildcard-exports		formData	bool	false	"exports can contain wildcards"
+//	@Param			disallow-bearer			formData	bool	false	"require user jwt to not be bearer token"
+//	@Param			rm-sk					formData	string	false	"remove signing key - comma separated list or option can be specified multiple times"
+//	@Param			description				formData	string	false	"Description for this account"
+//	@Param			info-url				formData	string	false	"Link for more info on this account"
+//	@Param			js-tier					formData	string	false	"JetStream: replication tier (0 creates a configuration that applies to all assets) "
+//	@Param			rm-js-tier				formData	string	false	"JetStream: remove replication limits for the specified tier (0 is the global tier) this flag is exclusive of all other js flags"
+//	@Param			js-mem-storage			formData	string	false	"JetStream: set maximum memory storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
+//	@Param			js-disk-storage			formData	string	false	"JetStream: set maximum disk storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
+//	@Param			js-streams				formData	string	false	"JetStream: set maximum streams for the account (-1 is unlimited)"
+//	@Param			js-consumer				formData	string	false	"JetStream: set maximum consumer for the account (-1 is unlimited)"
+//	@Param			js-max-mem-stream		formData	string	false	"JetStream: set maximum size of a memory stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
+//	@Param			js-max-disk-stream		formData	string	false	"JetStream: set maximum size of a disk stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)"
+//	@Param			js-max-bytes-required	formData	string	false	"JetStream: set whether max stream is required when creating a stream"
+//	@Param			js-max-ack-pending		formData	string	false	"JetStream: set number of maximum acks that can be pending for a consumer in the account"
+//	@Param			name					formData	string	false	"account to edit"
+//
 // // @Param			js-disable				formData	string	false	"disables all JetStream limits in the account by deleting any limits"
-// @Summary		Updates an account
-// @Description	Updates an account and returns json with status ok if successful
-// @Success		200	{object}	SimpleJSONResponse	"Status ok"
-// @Failure		500	{object}	string				"Internal error"
+//
+//	@Summary		Updates an account
+//	@Description	Updates an account and returns json with status ok if successful
+//	@Success		200	{object}	SimpleJSONResponse	"Status ok"
+//	@Failure		500	{object}	string				"Internal error"
 func updateAccount(c echo.Context) error {
 	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
 	var updateAccountCmd = lookupCommand(updateCmd, "account")
@@ -206,6 +208,14 @@ func updateAccount(c echo.Context) error {
 	})
 }
 
+// @Tags			Account
+// @Router			/bind [get]
+// @Param			account		query	string	true	"Account name"
+// @Param			operator	query	string	true	"Operator name"
+// @Summary		read context bound to account
+// @Description	Returns json object with context
+// @Success		200	{object}	map[string]string	"Operator description"
+// @Failure		500	{object}	string				"Internal error"
 func readBindAccountCtx(c echo.Context) error {
 	store, err := storeType()
 	if err != nil {
@@ -225,6 +235,15 @@ func readBindAccountCtx(c echo.Context) error {
 	return c.JSON(200, &ent)
 }
 
+// @Tags			Account
+// @Router			/bind [post]
+// @Param			account		formData	string	true	"Account name"
+// @Param			operator	formData	string	true	"Operator name"
+// @Param			servers		formData	string	true	"Operator name"
+// @Summary		Bind context to account
+// @Description	Returns json with confirmation
+// @Success		200	{object}	map[string]string	"Operator description"
+// @Failure		500	{object}	string				"Internal error"
 func bindAccountCtx(c echo.Context) error {
 	store, err := storeType()
 	if err != nil {

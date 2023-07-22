@@ -16,6 +16,95 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/bind": {
+            "get": {
+                "description": "Returns json object with context",
+                "tags": [
+                    "Account"
+                ],
+                "summary": "read context bound to account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account name",
+                        "name": "account",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operator description",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Returns json with confirmation",
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Bind context to account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account name",
+                        "name": "account",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "servers",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operator description",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/creds/operator/{operator}/account/{account}/user/{name}": {
             "get": {
                 "tags": [
