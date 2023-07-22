@@ -10,6 +10,8 @@ services:
       - NKEYS_PATH=/nsc/keys
       - NSC_HOME=/nsc/home
       - NSC_STORE=/nsc/store
+      - JETONO_STORE_TYPE=objectbox
+      - OBJECTBOX_VOL=/mnt/objectbox
     ports:
       - "8080:1323"
     volumes:

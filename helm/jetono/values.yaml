@@ -92,3 +92,7 @@ env:
     value: /nsc/home
   - name: NSC_STORE
     value: /nsc/store
+  - name: JETONO_STORE_TYPE
+    value: objectbox # objectbox or kubernetes
+  - name: OBJECTBOX_VOL
+    value: /mnt/objectbox
