@@ -1,14 +1,11 @@
 package src
 
 import (
-	"context"
 	"fmt"
+	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"strings"
 )
 
 func init() {
@@ -43,7 +40,7 @@ func createSecret(c echo.Context) error {
 	creds, err := GetUserCreds(operator, account, user)
 
 	if secretName == "" {
-		secretName = fmt.Sprintf("%s.%s.%s.creds", slugify(operator), slugify(account), slugify(user))
+		secretName = fmt.Sprintf("%s.%s.%s.creds", storage.Slugify(operator), storage.Slugify(account), storage.Slugify(user))
 	}
 
 	if err != nil {
@@ -67,24 +64,12 @@ func createSecret(c echo.Context) error {
 	)
 }
 
-func slugify(s string) string {
-	// slugify operator name for k8s secret name
-	s = strings.ReplaceAll(s, " ", "-")
-	s = strings.ReplaceAll(s, "_", "-")
-	return s
-}
-
 func createSecretWithCredentials(secretName string, ns string, data map[string][]byte) (*v1.Secret, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-	kube, err := kubernetes.NewForConfig(config)
+	kube, ctx, err := storage.InitK8sWithCtx()
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := context.TODO()
 	secret := &v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: secretName,

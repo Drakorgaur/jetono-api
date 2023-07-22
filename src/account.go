@@ -1,6 +1,7 @@
 package src
 
 import (
+	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
 )
@@ -16,6 +17,9 @@ func init() {
 	GetEchoRoot().GET("operator/:operator/"+module+"/:name", describeAccount)
 
 	GetEchoRoot().PATCH("operator/:operator/"+module+"/:name", updateAccount)
+
+	GetEchoRoot().GET("bind", readBindAccountCtx)
+	GetEchoRoot().POST("bind", bindAccountCtx)
 }
 
 // @Tags			Account
@@ -199,5 +203,45 @@ func updateAccount(c echo.Context) error {
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
 		Message: "Account updated",
+	})
+}
+
+func readBindAccountCtx(c echo.Context) error {
+	store, err := storeType()
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	ent := storage.AccountServerMap{
+		Operator: c.QueryParam("operator"),
+		Account:  c.QueryParam("account"),
+	}
+	err = store.Read(&ent)
+
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, &ent)
+}
+
+func bindAccountCtx(c echo.Context) error {
+	store, err := storeType()
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	err = store.Store(&storage.AccountServerMap{
+		Operator: c.FormValue("operator"),
+		Account:  c.FormValue("account"),
+		Servers:  c.FormValue("servers"),
+	})
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, &SimpleJSONResponse{
+		Status:  "200",
+		Message: "Account bound",
 	})
 }

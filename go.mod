@@ -6,6 +6,7 @@ require (
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/nats-io/jwt/v2 v2.4.1
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
+	github.com/objectbox/objectbox-go v1.7.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.5
 	github.com/swaggo/echo-swagger v1.4.0
@@ -33,6 +34,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/flatbuffers v23.5.26+incompatible // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
@@ -60,6 +62,7 @@ require (
 	github.com/nats-io/nats.go v1.16.0 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
+	github.com/objectbox/objectbox-generator v0.13.0 // indirect
 	github.com/rhysd/go-github-selfupdate v1.2.2 // indirect
 	github.com/russross/blackfriday v1.5.2 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
