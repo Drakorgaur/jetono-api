@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/objectbox/objectbox-go/objectbox"
+	"os"
 )
 
 type ObjectBoxStore struct{}
@@ -11,7 +12,13 @@ type ErrNotFound struct{}
 func (e ErrNotFound) Error() string { return "object(s) was not found" }
 
 func initObjectBox() (*objectbox.ObjectBox, error) {
-	objectBox, err := objectbox.NewBuilder().Model(ObjectBoxModel()).Build()
+	builder := objectbox.NewBuilder().Model(ObjectBoxModel())
+	volume := os.Getenv("OBJECTBOX_VOL")
+	if volume == "" {
+		volume = "./objectbox"
+	}
+	builder.Directory(volume)
+	objectBox, err := builder.Build()
 	if err != nil {
 		return nil, err
 	}
