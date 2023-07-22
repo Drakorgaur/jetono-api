@@ -19,5 +19,13 @@
 
 # Go workspace file
 go.work
+go.work*
 
+# local folders
 nsc
+script
+tmp
+
+# IntelliJ
+.idea
+
