@@ -96,7 +96,7 @@ func listAccounts(c echo.Context) error {
 	//   "message": "`/nsc/store` is not a valid data directory: stat /nsc/store/.nsc: no such file or directory"
 	//  }
 
-	config.Operator = c.QueryParam("operator")
+	config.Operator = c.Param("operator")
 
 	if accounts, err := config.ListAccounts(); err != nil {
 		return badRequest(c, err)
