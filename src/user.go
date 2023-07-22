@@ -37,6 +37,7 @@ func init() {
 // @Failure		400			{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500			{object}	string				"Internal error"
 func addUser(c echo.Context) error {
+	cmd := nsc.CreateAddUserCmd()
 	nsc.GetConfig().Operator = c.Param("operator")
 	nsc.GetConfig().Account = c.Param("account")
 
@@ -44,7 +45,17 @@ func addUser(c echo.Context) error {
 		return c.JSON(400, map[string]string{"code": "400", "message": "required form data no filled", "field": flag})
 	}
 
-	cmd := nsc.CreateAddUserCmd()
+	err := setFlagsIfInForm(cmd, c.FormValue, []string{
+		// "url", is not supported yet.
+		"name",
+		"tag",
+		"start",
+		"expiry",
+	})
+	if err != nil {
+		return badRequest(c, err)
+	}
+
 	if err := cmd.Flags().Set("account", nsc.GetConfig().Account); err != nil {
 		return badRequest(c, err)
 	}

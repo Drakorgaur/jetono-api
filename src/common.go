@@ -16,6 +16,7 @@ func initInfo(value string) {
 }
 
 func badRequest(c echo.Context, err error) error {
+	// TODO: rewrite as echo.Context.Error
 	return c.JSON(400, &SimpleJSONResponse{
 		Status:  "400",
 		Message: err.Error(),
@@ -50,16 +51,13 @@ func bodyAsJson(data []byte) ([]byte, error) {
 
 func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []string) error {
 	for _, flag := range flags {
-		if value := getFlag(flag); value == "" {
-			continue
+		value := getFlag(flag)
+		f := cmd.Flag(flag)
+		f.Changed = true
+		if val, ok := f.Value.(pflag.SliceValue); ok {
+			_ = val.Replace([]string{value})
 		} else {
-			f := cmd.Flag(flag)
-			f.Changed = true
-			if val, ok := f.Value.(pflag.SliceValue); ok {
-				_ = val.Replace([]string{value})
-			} else {
-				_ = f.Value.Set(value)
-			}
+			_ = f.Value.Set(value)
 		}
 	}
 	return nil

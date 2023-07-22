@@ -51,6 +51,7 @@ func addAccount(c echo.Context) error {
 
 	err := setFlagsIfInForm(addAccountCmd, c.FormValue, []string{
 		// "url", is not supported yet.
+		"name",
 		"response-ttl",
 		"allow-pub-response",
 		"allow-pub",

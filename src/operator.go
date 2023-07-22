@@ -40,6 +40,7 @@ func addOperator(c echo.Context) error {
 
 	err := setFlagsIfInForm(addOperatorCmd, c.FormValue, []string{
 		// "url", is not supported yet.
+		"name",
 		"generate-signing-key",
 		"sys",
 		"force",
