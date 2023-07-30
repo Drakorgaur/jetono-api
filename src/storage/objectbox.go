@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"github.com/objectbox/objectbox-go/objectbox"
 	"os"
 )
@@ -10,6 +11,8 @@ type ObjectBoxStore struct{}
 type ErrNotFound struct{}
 
 func (e ErrNotFound) Error() string { return "object(s) was not found" }
+
+var errNotFound ErrNotFound
 
 func initObjectBox() (*objectbox.ObjectBox, error) {
 	builder := objectbox.NewBuilder().Model(ObjectBoxModel())
@@ -36,7 +39,7 @@ func (s *ObjectBoxStore) Store(asm *AccountServerMap) error {
 	box := BoxForAccountServerMapB(ob)
 
 	asmb, err := getAccountServerMapB(box, asm)
-	if _, ok := err.(ErrNotFound); ok {
+	if errors.As(err, &errNotFound) {
 		_, err = box.Put(&AccountServerMapB{
 			AccountServerMap: *asm,
 			Uid:              GenerateUid(asm.Operator, asm.Account),

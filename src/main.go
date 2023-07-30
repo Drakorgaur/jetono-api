@@ -22,6 +22,8 @@ func GetEchoRoot() *echo.Echo {
 func init() {
 	cmd.Json = true
 
+	// TODO: create enum with options kubeful, kubeless, kubeintegrated.
+
 	if err := setUp(); err != nil {
 		_ = fmt.Errorf("init failed")
 	}

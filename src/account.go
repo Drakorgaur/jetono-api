@@ -19,6 +19,7 @@ func init() {
 	GetEchoRoot().PATCH("operator/:operator/"+module+"/:name", updateAccount)
 
 	GetEchoRoot().GET("bind", readBindAccountCtx)
+
 	GetEchoRoot().POST("bind", bindAccountCtx)
 }
 

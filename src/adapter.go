@@ -7,10 +7,10 @@ import (
 )
 
 func init() {
-	resetMiddleware()
+	resetCliMiddleware()
 }
 
-func resetMiddleware() {
+func resetCliMiddleware() {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			resetGlobalVars()
