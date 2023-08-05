@@ -218,7 +218,7 @@ func updateAccount(c echo.Context) error {
 // @Success		200	{object}	map[string]string	"Operator description"
 // @Failure		500	{object}	string				"Internal error"
 func readBindAccountCtx(c echo.Context) error {
-	store, err := storeType()
+	store, err := storage.StoreType()
 	if err != nil {
 		return badRequest(c, err)
 	}
@@ -227,7 +227,7 @@ func readBindAccountCtx(c echo.Context) error {
 		Operator: c.QueryParam("operator"),
 		Account:  c.QueryParam("account"),
 	}
-	err = store.Read(&ent)
+	err = store.ReadCtx(&ent)
 
 	if err != nil {
 		return badRequest(c, err)
@@ -240,21 +240,21 @@ func readBindAccountCtx(c echo.Context) error {
 // @Router			/bind [post]
 // @Param			account		formData	string	true	"Account name"
 // @Param			operator	formData	string	true	"Operator name"
-// @Param			servers		formData	string	true	"Operator name"
+// @Param			servers		formData	string	true	"Server list separated by comma"
 // @Summary		Bind context to account
 // @Description	Returns json with confirmation
 // @Success		200	{object}	map[string]string	"Operator description"
 // @Failure		500	{object}	string				"Internal error"
 func bindAccountCtx(c echo.Context) error {
-	store, err := storeType()
+	store, err := storage.StoreType()
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	err = store.Store(&storage.AccountServerMap{
-		Operator: c.FormValue("operator"),
-		Account:  c.FormValue("account"),
-		Servers:  c.FormValue("servers"),
+	err = store.StoreCtx(&storage.AccountServerMap{
+		Operator:    c.FormValue("operator"),
+		Account:     c.FormValue("account"),
+		ServersList: c.FormValue("servers"),
 	})
 	if err != nil {
 		return badRequest(c, err)

@@ -6,11 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"os"
 )
 
 func initInfo(value string) {
@@ -49,18 +47,6 @@ func bodyAsJson(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("error formatting json: %v", err)
 	}
 	return j.Bytes(), nil
-}
-
-func storeType() (storage.Storage, error) {
-	storeType := os.Getenv("JETONO_STORE_TYPE")
-	switch storeType {
-	case "kubernetes":
-		return &storage.KubernetesStore{}, nil
-	case "objectbox":
-		return &storage.ObjectBoxStore{}, nil
-	default:
-		return nil, fmt.Errorf("invalid store type: %s", storeType)
-	}
 }
 
 func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []string) error {
