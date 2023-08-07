@@ -65,7 +65,7 @@ func createSecret(c echo.Context) error {
 }
 
 func createSecretWithCredentials(secretName string, ns string, data map[string][]byte) (*v1.Secret, error) {
-	kube, ctx, err := storage.InitK8sWithCtx()
+	kube, ctx, err := storage.InitKubeWithCtx()
 	if err != nil {
 		return nil, err
 	}

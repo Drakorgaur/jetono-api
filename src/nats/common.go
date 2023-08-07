@@ -3,7 +3,7 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-	jetono "github.com/Drakorgaur/jetono-api/src"
+	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nkeys"
 	"os"
@@ -160,28 +160,23 @@ func configurationTemplate(c Configurator) func(*nats.Options) error {
 	}
 }
 
-type Ctx struct {
-	Operator string
-	Account  string
-	User     string
+type UserNatsConn struct {
+	*storage.AccountServerMap
+	*nats.Conn
+	conf  Configurator
+	creds []byte
 }
 
-type UserNatsConn struct {
-	*nats.Conn
-	*Ctx
-	conf Configurator
+func (u *UserNatsConn) SetCreds(creds []byte) {
+	u.creds = creds
 }
 
 func (u *UserNatsConn) UserCredentials() nats.Option {
-	creds, err := jetono.GetUserCreds(u.Operator, u.Account, u.User)
-	if err != nil {
-		return nil
-	}
 	userCB := func() (string, error) {
-		return nkeys.ParseDecoratedJWT(creds)
+		return nkeys.ParseDecoratedJWT(u.creds)
 	}
 	sigCB := func(nonce []byte) ([]byte, error) {
-		kp, err := nkeys.ParseDecoratedNKey(creds)
+		kp, err := nkeys.ParseDecoratedNKey(u.creds)
 		if err != nil {
 			return nil, fmt.Errorf("unable to extract key pair from file %v", err)
 		}
@@ -197,7 +192,7 @@ func (u *UserNatsConn) authTemplate(opts []nats.Option) {
 	opts = append(opts, u.UserCredentials())
 }
 
-func (u *UserNatsConn) GetNats(url string) (*nats.Conn, error) {
+func (u *UserNatsConn) GetNats() (*nats.Conn, error) {
 	if u.conf == nil {
 		u.conf = &DefaultConfigurator{}
 	}
@@ -205,7 +200,7 @@ func (u *UserNatsConn) GetNats(url string) (*nats.Conn, error) {
 		configurationTemplate(u.conf),
 	}
 	u.authTemplate(options)
-	if nc, err := nats.Connect(url, options...); err != nil {
+	if nc, err := nats.Connect(u.ServersList, options...); err != nil {
 		return nil, err
 	} else {
 		return nc, nil

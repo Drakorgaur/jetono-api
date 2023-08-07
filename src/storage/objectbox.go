@@ -29,7 +29,7 @@ func initObjectBox() (*objectbox.ObjectBox, error) {
 	return objectBox, nil
 }
 
-func (s *ObjectBoxStore) Store(asm *AccountServerMap) error {
+func (s *ObjectBoxStore) StoreCtx(asm *AccountServerMap) error {
 	ob, err := initObjectBox()
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func getAccountServerMapB(box *AccountServerMapBBox, asm *AccountServerMap) (*Ac
 	return res[0], nil
 }
 
-func (s *ObjectBoxStore) Read(asm *AccountServerMap) error {
+func (s *ObjectBoxStore) ReadCtx(asm *AccountServerMap) error {
 	ob, err := initObjectBox()
 	if err != nil {
 		return err
@@ -87,7 +87,7 @@ func (s *ObjectBoxStore) Read(asm *AccountServerMap) error {
 		return err
 	}
 
-	asm.Servers = asmb.Servers
+	asm.ServersList = asmb.ServersList
 
 	return nil
 }

@@ -4,6 +4,11 @@ metadata:
   name: {{ include "jetono.role.name" . }}
   labels: {{ include "jetono.labels" . | nindent 4 }}
 rules:
-- apiGroups: [""] # "" indicates the core API group
+- apiGroups: [""]
   resources: ["secrets"]
   verbs: ["create"]
+# configmaps is used in kubernetes-ful mode of jetono
+# jetono stores contexts in configmaps.
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["create", "get", "update", "delete"]
