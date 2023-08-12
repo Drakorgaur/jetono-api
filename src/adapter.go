@@ -6,17 +6,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	resetCliMiddleware()
-}
-
-func resetCliMiddleware() {
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+func resetCliMiddleware() func(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			resetGlobalVars()
 			return next(c)
 		}
-	})
+	}
 }
 
 // resetGlobalVars resets global variables from nsc package as one
@@ -31,11 +27,5 @@ func lookupCommand(root *cobra.Command, name string) *cobra.Command {
 			return e
 		}
 	}
-	return nil
-}
-
-func omitCmdOutput() error {
-	// TODO: implement
-	// function should set cobra.Command outputFlag to /dev/null
 	return nil
 }

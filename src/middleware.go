@@ -9,6 +9,7 @@ func init() {
 
 	// Middleware
 	// TODO
+	e.Use(resetCliMiddleware())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 }
