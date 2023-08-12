@@ -298,7 +298,6 @@ func getUserStreams(c echo.Context) error {
 	accCtx := storage.AccountServerMap{
 		Operator:    c.QueryParam("operator"),
 		Account:     c.QueryParam("account"),
-		User:        c.QueryParam("user"),
 		ServersList: c.QueryParam("servers"),
 	}
 
@@ -312,7 +311,7 @@ func getUserStreams(c echo.Context) error {
 	u := lib.UserNatsConn{
 		AccountServerMap: &accCtx,
 	}
-	creds, _ := GetUserCreds(u.Operator, u.Account, u.User)
+	creds, _ := GetUserCreds(u.Operator, u.Account, c.Param("user"))
 	u.SetCreds(creds)
 	streams, err := u.GetStreams()
 	if err != nil {
