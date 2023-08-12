@@ -72,7 +72,7 @@ func setFlagsIfInJson(cmd *cobra.Command, s interface{}, ctx echo.Context) error
 	m := structs.Map(s)
 
 	for flag, value := range m {
-		if value == nil {
+		if value == nil || value == "" {
 			continue
 		}
 		formatterFlagName := strcase.KebabCase(flag)
