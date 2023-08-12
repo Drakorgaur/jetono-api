@@ -80,7 +80,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Operator name",
+                        "description": "Server list separated by comma",
                         "name": "servers",
                         "in": "formData",
                         "required": true
@@ -171,41 +171,13 @@ const docTemplate = `{
                 "summary": "Add an operator",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Operator name",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "generate a signing key with the operator",
-                        "name": "generate-signing-key",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "generate system account with the operator (if specified will be signed with signing key)",
-                        "name": "sys",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "on import, overwrite existing when already present",
-                        "name": "force",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "start",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "expiry",
-                        "in": "formData"
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addOperatorForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -276,52 +248,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "add tags for user - comma separated list or option can be specified multiple times",
-                        "name": "tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove tag - comma separated list or option can be specified multiple times",
-                        "name": "rm-tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set account jwt server url for nsc sync (only http/https/nats urls supported if updating with nsc)",
-                        "name": "account-jwt-server-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set system account by account by public key or name",
-                        "name": "system-account",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add an operator service url - comma separated list or option can be specified multiple times",
-                        "name": "service-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove an operator service url - comma separated list or option can be specified multiple times",
-                        "name": "rm-service-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "require accounts/user to be signed with a signing key",
-                        "name": "require-signing-keys",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "clear account server url",
-                        "name": "rm-account-jwt-server-url",
-                        "in": "formData"
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.updateOperatorForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -350,77 +283,19 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account name",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Operator name",
                         "name": "operator",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "the amount of time the default permission is valid (global) - [#ms(millis) | #s(econds) | m(inutes) | h(ours)] - Default is no time limit.",
-                        "name": "response-ttl",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "%s to limit how often a client can publish to reply subjects [with an optional count, --allow-pub-response=n] (global)",
-                        "name": "allow-pub-response",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish %s - comma separated list or option can be specified multiple times",
-                        "name": "allow-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish and subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "allow-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "allow-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny publish %s - comma separated list or option can be specified multiple times",
-                        "name": "deny-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny publish and subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "deny-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "deny-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "start",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "expiry",
-                        "in": "formData"
+                        "description": "Account data in json format",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.AddAccountForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -1191,6 +1066,44 @@ const docTemplate = `{
                 }
             }
         },
+        "src.AddAccountForm": {
+            "type": "object",
+            "properties": {
+                "allow_pub": {
+                    "type": "string"
+                },
+                "allow_pub_response": {
+                    "type": "string"
+                },
+                "allow_pubsub": {
+                    "type": "string"
+                },
+                "allow_sub": {
+                    "type": "string"
+                },
+                "deny_pub": {
+                    "type": "string"
+                },
+                "deny_pubsub": {
+                    "type": "string"
+                },
+                "deny_sub": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "response_ttl": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                }
+            }
+        },
         "src.OperatorDescription": {
             "type": "object",
             "properties": {
@@ -1277,6 +1190,61 @@ const docTemplate = `{
                     }
                 },
                 "sub": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.addOperatorForm": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "expiry": {
+                    "type": "string"
+                },
+                "force": {
+                    "type": "boolean"
+                },
+                "generate_signing_key": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "sys": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "src.updateOperatorForm": {
+            "type": "object",
+            "properties": {
+                "account_jwt_server_url": {
+                    "type": "string"
+                },
+                "require_signing_keys": {
+                    "type": "boolean"
+                },
+                "rm_account_jwt_server_url": {
+                    "type": "string"
+                },
+                "rm_service_url": {
+                    "type": "string"
+                },
+                "rm_tag": {
+                    "type": "string"
+                },
+                "service_url": {
+                    "type": "string"
+                },
+                "system_account": {
+                    "type": "string"
+                },
+                "tag": {
                     "type": "string"
                 }
             }

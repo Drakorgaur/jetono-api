@@ -51,6 +51,31 @@ definitions:
       sub:
         type: string
     type: object
+  src.AddAccountForm:
+    properties:
+      allow_pub:
+        type: string
+      allow_pub_response:
+        type: string
+      allow_pubsub:
+        type: string
+      allow_sub:
+        type: string
+      deny_pub:
+        type: string
+      deny_pubsub:
+        type: string
+      deny_sub:
+        type: string
+      expiry:
+        type: string
+      name:
+        type: string
+      response_ttl:
+        type: string
+      start:
+        type: string
+    type: object
   src.OperatorDescription:
     properties:
       iat:
@@ -110,6 +135,42 @@ definitions:
       sub:
         type: string
     type: object
+  src.addOperatorForm:
+    properties:
+      expiry:
+        type: string
+      force:
+        type: boolean
+      generate_signing_key:
+        type: boolean
+      name:
+        type: string
+      start:
+        type: string
+      sys:
+        type: boolean
+    required:
+    - name
+    type: object
+  src.updateOperatorForm:
+    properties:
+      account_jwt_server_url:
+        type: string
+      require_signing_keys:
+        type: boolean
+      rm_account_jwt_server_url:
+        type: string
+      rm_service_url:
+        type: string
+      rm_tag:
+        type: string
+      service_url:
+        type: string
+      system_account:
+        type: string
+      tag:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -154,7 +215,7 @@ paths:
         name: operator
         required: true
         type: string
-      - description: Operator name
+      - description: Server list separated by comma
         in: formData
         name: servers
         required: true
@@ -215,34 +276,12 @@ paths:
     post:
       description: Add an operator to the store
       parameters:
-      - description: Operator name
-        in: formData
-        name: name
+      - description: request body
+        in: body
+        name: json
         required: true
-        type: string
-      - description: generate a signing key with the operator
-        in: formData
-        name: generate-signing-key
-        type: boolean
-      - description: generate system account with the operator (if specified will
-          be signed with signing key)
-        in: formData
-        name: sys
-        type: boolean
-      - description: on import, overwrite existing when already present
-        in: formData
-        name: force
-        type: boolean
-      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: start
-        type: string
-      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: expiry
-        type: string
+        schema:
+          $ref: '#/definitions/src.addOperatorForm'
       responses:
         "200":
           description: Operator added
@@ -288,43 +327,12 @@ paths:
         name: name
         required: true
         type: string
-      - description: add tags for user - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: tag
-        type: string
-      - description: remove tag - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-tag
-        type: string
-      - description: set account jwt server url for nsc sync (only http/https/nats
-          urls supported if updating with nsc)
-        in: formData
-        name: account-jwt-server-url
-        type: string
-      - description: set system account by account by public key or name
-        in: formData
-        name: system-account
-        type: string
-      - description: add an operator service url - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: service-url
-        type: string
-      - description: remove an operator service url - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: rm-service-url
-        type: string
-      - description: require accounts/user to be signed with a signing key
-        in: formData
-        name: require-signing-keys
-        type: boolean
-      - description: clear account server url
-        in: formData
-        name: rm-account-jwt-server-url
-        type: string
+      - description: request body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.updateOperatorForm'
       responses:
         "200":
           description: Status ok
@@ -341,67 +349,17 @@ paths:
     post:
       description: Add an account with given operator to the store
       parameters:
-      - description: Account name
-        in: formData
-        name: name
-        required: true
-        type: string
       - description: Operator name
         in: path
         name: operator
         required: true
         type: string
-      - description: 'the amount of time the default permission is valid (global)
-          - [#ms(millis) | #s(econds) | m(inutes) | h(ours)] - Default is no time
-          limit.'
-        in: formData
-        name: response-ttl
-        type: string
-      - description: '%s to limit how often a client can publish to reply subjects
-          [with an optional count, --allow-pub-response=n] (global)'
-        in: formData
-        name: allow-pub-response
-        type: string
-      - description: add publish %s - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: allow-pub
-        type: string
-      - description: add publish and subscribe %s - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: allow-pubsub
-        type: string
-      - description: add subscribe %s - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: allow-sub
-        type: string
-      - description: add deny publish %s - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: deny-pub
-        type: string
-      - description: add deny publish and subscribe %s - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: deny-pubsub
-        type: string
-      - description: add deny subscribe %s - comma separated list or option can be
-          specified multiple times
-        in: formData
-        name: deny-sub
-        type: string
-      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: start
-        type: string
-      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: expiry
-        type: string
+      - description: Account data in json format
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.AddAccountForm'
       responses:
         "200":
           description: Account added
