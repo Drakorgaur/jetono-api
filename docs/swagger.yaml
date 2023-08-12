@@ -51,31 +51,6 @@ definitions:
       sub:
         type: string
     type: object
-  src.AddAccountForm:
-    properties:
-      allow_pub:
-        type: string
-      allow_pub_response:
-        type: string
-      allow_pubsub:
-        type: string
-      allow_sub:
-        type: string
-      deny_pub:
-        type: string
-      deny_pubsub:
-        type: string
-      deny_sub:
-        type: string
-      expiry:
-        type: string
-      name:
-        type: string
-      response_ttl:
-        type: string
-      start:
-        type: string
-    type: object
   src.OperatorDescription:
     properties:
       iat:
@@ -135,6 +110,31 @@ definitions:
       sub:
         type: string
     type: object
+  src.addAccountForm:
+    properties:
+      allow_pub:
+        type: string
+      allow_pub_response:
+        type: string
+      allow_pubsub:
+        type: string
+      allow_sub:
+        type: string
+      deny_pub:
+        type: string
+      deny_pubsub:
+        type: string
+      deny_sub:
+        type: string
+      expiry:
+        type: string
+      name:
+        type: string
+      response_ttl:
+        type: string
+      start:
+        type: string
+    type: object
   src.addOperatorForm:
     properties:
       expiry:
@@ -151,6 +151,57 @@ definitions:
         type: boolean
     required:
     - name
+    type: object
+  src.updateAccountForm:
+    properties:
+      conns:
+        type: string
+      data:
+        type: string
+      description:
+        type: string
+      disallow_bearer:
+        type: boolean
+      exports:
+        type: string
+      imports:
+        type: string
+      info_url:
+        type: string
+      js_consumer:
+        type: string
+      js_disk_storage:
+        type: string
+      js_max_ack_pending:
+        type: string
+      js_max_bytes_required:
+        type: string
+      js_max_disk_stream:
+        type: string
+      js_max_mem_stream:
+        type: string
+      js_mem_storage:
+        type: string
+      js_streams:
+        type: string
+      js_tier:
+        type: string
+      leaf_conns:
+        type: string
+      payload:
+        type: string
+      rm_js_tier:
+        type: string
+      rm_sk:
+        type: string
+      rm_tag:
+        type: string
+      subscriptions:
+        type: string
+      tag:
+        type: string
+      wildcard_exports:
+        type: boolean
     type: object
   src.updateOperatorForm:
     properties:
@@ -169,6 +220,15 @@ definitions:
       system_account:
         type: string
       tag:
+        type: string
+    type: object
+  storage.AccountServerMap:
+    properties:
+      account:
+        type: string
+      operator:
+        type: string
+      servers:
         type: string
     type: object
 info:
@@ -205,21 +265,12 @@ paths:
     post:
       description: Returns json with confirmation
       parameters:
-      - description: Account name
-        in: formData
-        name: account
+      - description: json
+        in: body
+        name: json
         required: true
-        type: string
-      - description: Operator name
-        in: formData
-        name: operator
-        required: true
-        type: string
-      - description: Server list separated by comma
-        in: formData
-        name: servers
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/storage.AccountServerMap'
       responses:
         "200":
           description: Operator description
@@ -359,7 +410,7 @@ paths:
         name: json
         required: true
         schema:
-          $ref: '#/definitions/src.AddAccountForm'
+          $ref: '#/definitions/src.addAccountForm'
       responses:
         "200":
           description: Account added
@@ -686,118 +737,12 @@ paths:
         name: operator
         required: true
         type: string
-      - description: add tags for user - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: tag
-        type: string
-      - description: remove tag - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-tag
-        type: string
-      - description: set maximum active connections for the account (-1 is unlimited)
-        in: formData
-        name: conns
-        type: string
-      - description: set maximum active leaf node connections for the account (-1
-          is unlimited)
-        in: formData
-        name: leaf-conns
-        type: string
-      - description: set maximum data in bytes for the account (-1 is unlimited)
-        in: formData
-        name: data
-        type: string
-      - description: set maximum number of exports for the account (-1 is unlimited)
-        in: formData
-        name: exports
-        type: string
-      - description: set maximum number of imports for the account (-1 is unlimited)
-        in: formData
-        name: imports
-        type: string
-      - description: set maximum message payload in bytes for the account (-1 is unlimited)
-        in: formData
-        name: payload
-        type: string
-      - description: set maximum subscription for the account (-1 is unlimited)
-        in: formData
-        name: subscriptions
-        type: string
-      - description: exports can contain wildcards
-        in: formData
-        name: wildcard-exports
-        type: boolean
-      - description: require user jwt to not be bearer token
-        in: formData
-        name: disallow-bearer
-        type: boolean
-      - description: remove signing key - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-sk
-        type: string
-      - description: Description for this account
-        in: formData
-        name: description
-        type: string
-      - description: Link for more info on this account
-        in: formData
-        name: info-url
-        type: string
-      - description: 'JetStream: replication tier (0 creates a configuration that
-          applies to all assets) '
-        in: formData
-        name: js-tier
-        type: string
-      - description: 'JetStream: remove replication limits for the specified tier
-          (0 is the global tier) this flag is exclusive of all other js flags'
-        in: formData
-        name: rm-js-tier
-        type: string
-      - description: 'JetStream: set maximum memory storage in bytes for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-mem-storage
-        type: string
-      - description: 'JetStream: set maximum disk storage in bytes for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-disk-storage
-        type: string
-      - description: 'JetStream: set maximum streams for the account (-1 is unlimited)'
-        in: formData
-        name: js-streams
-        type: string
-      - description: 'JetStream: set maximum consumer for the account (-1 is unlimited)'
-        in: formData
-        name: js-consumer
-        type: string
-      - description: 'JetStream: set maximum size of a memory stream for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-max-mem-stream
-        type: string
-      - description: 'JetStream: set maximum size of a disk stream for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-max-disk-stream
-        type: string
-      - description: 'JetStream: set whether max stream is required when creating
-          a stream'
-        in: formData
-        name: js-max-bytes-required
-        type: string
-      - description: 'JetStream: set number of maximum acks that can be pending for
-          a consumer in the account'
-        in: formData
-        name: js-max-ack-pending
-        type: string
-      - description: account to edit
-        in: formData
-        name: name
-        type: string
+      - description: Account data in json format
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.updateAccountForm'
       responses:
         "200":
           description: Status ok

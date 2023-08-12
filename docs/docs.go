@@ -65,25 +65,13 @@ const docTemplate = `{
                 "summary": "Bind context to account",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Account name",
-                        "name": "account",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Operator name",
-                        "name": "operator",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Server list separated by comma",
-                        "name": "servers",
-                        "in": "formData",
-                        "required": true
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.AccountServerMap"
+                        }
                     }
                 ],
                 "responses": {
@@ -294,7 +282,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/src.AddAccountForm"
+                            "$ref": "#/definitions/src.addAccountForm"
                         }
                     }
                 ],
@@ -758,154 +746,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "add tags for user - comma separated list or option can be specified multiple times",
-                        "name": "tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove tag - comma separated list or option can be specified multiple times",
-                        "name": "rm-tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum active connections for the account (-1 is unlimited)",
-                        "name": "conns",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum active leaf node connections for the account (-1 is unlimited)",
-                        "name": "leaf-conns",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum data in bytes for the account (-1 is unlimited)",
-                        "name": "data",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum number of exports for the account (-1 is unlimited)",
-                        "name": "exports",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum number of imports for the account (-1 is unlimited)",
-                        "name": "imports",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum message payload in bytes for the account (-1 is unlimited)",
-                        "name": "payload",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum subscription for the account (-1 is unlimited)",
-                        "name": "subscriptions",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "exports can contain wildcards",
-                        "name": "wildcard-exports",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "require user jwt to not be bearer token",
-                        "name": "disallow-bearer",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove signing key - comma separated list or option can be specified multiple times",
-                        "name": "rm-sk",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Description for this account",
-                        "name": "description",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Link for more info on this account",
-                        "name": "info-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: replication tier (0 creates a configuration that applies to all assets) ",
-                        "name": "js-tier",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: remove replication limits for the specified tier (0 is the global tier) this flag is exclusive of all other js flags",
-                        "name": "rm-js-tier",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum memory storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-mem-storage",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum disk storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-disk-storage",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum streams for the account (-1 is unlimited)",
-                        "name": "js-streams",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum consumer for the account (-1 is unlimited)",
-                        "name": "js-consumer",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum size of a memory stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-max-mem-stream",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum size of a disk stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-max-disk-stream",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set whether max stream is required when creating a stream",
-                        "name": "js-max-bytes-required",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set number of maximum acks that can be pending for a consumer in the account",
-                        "name": "js-max-ack-pending",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "account to edit",
-                        "name": "name",
-                        "in": "formData"
+                        "description": "Account data in json format",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.updateAccountForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -1066,44 +913,6 @@ const docTemplate = `{
                 }
             }
         },
-        "src.AddAccountForm": {
-            "type": "object",
-            "properties": {
-                "allow_pub": {
-                    "type": "string"
-                },
-                "allow_pub_response": {
-                    "type": "string"
-                },
-                "allow_pubsub": {
-                    "type": "string"
-                },
-                "allow_sub": {
-                    "type": "string"
-                },
-                "deny_pub": {
-                    "type": "string"
-                },
-                "deny_pubsub": {
-                    "type": "string"
-                },
-                "deny_sub": {
-                    "type": "string"
-                },
-                "expiry": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "response_ttl": {
-                    "type": "string"
-                },
-                "start": {
-                    "type": "string"
-                }
-            }
-        },
         "src.OperatorDescription": {
             "type": "object",
             "properties": {
@@ -1194,6 +1003,44 @@ const docTemplate = `{
                 }
             }
         },
+        "src.addAccountForm": {
+            "type": "object",
+            "properties": {
+                "allow_pub": {
+                    "type": "string"
+                },
+                "allow_pub_response": {
+                    "type": "string"
+                },
+                "allow_pubsub": {
+                    "type": "string"
+                },
+                "allow_sub": {
+                    "type": "string"
+                },
+                "deny_pub": {
+                    "type": "string"
+                },
+                "deny_pubsub": {
+                    "type": "string"
+                },
+                "deny_sub": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "response_ttl": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                }
+            }
+        },
         "src.addOperatorForm": {
             "type": "object",
             "required": [
@@ -1216,6 +1063,83 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "sys": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "src.updateAccountForm": {
+            "type": "object",
+            "properties": {
+                "conns": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "disallow_bearer": {
+                    "type": "boolean"
+                },
+                "exports": {
+                    "type": "string"
+                },
+                "imports": {
+                    "type": "string"
+                },
+                "info_url": {
+                    "type": "string"
+                },
+                "js_consumer": {
+                    "type": "string"
+                },
+                "js_disk_storage": {
+                    "type": "string"
+                },
+                "js_max_ack_pending": {
+                    "type": "string"
+                },
+                "js_max_bytes_required": {
+                    "type": "string"
+                },
+                "js_max_disk_stream": {
+                    "type": "string"
+                },
+                "js_max_mem_stream": {
+                    "type": "string"
+                },
+                "js_mem_storage": {
+                    "type": "string"
+                },
+                "js_streams": {
+                    "type": "string"
+                },
+                "js_tier": {
+                    "type": "string"
+                },
+                "leaf_conns": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "rm_js_tier": {
+                    "type": "string"
+                },
+                "rm_sk": {
+                    "type": "string"
+                },
+                "rm_tag": {
+                    "type": "string"
+                },
+                "subscriptions": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "wildcard_exports": {
                     "type": "boolean"
                 }
             }
@@ -1245,6 +1169,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "storage.AccountServerMap": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                },
+                "servers": {
                     "type": "string"
                 }
             }
