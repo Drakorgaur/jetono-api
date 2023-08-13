@@ -25,6 +25,7 @@ func init() {
 
 type addAccountForm struct {
 	Name             string `json:"name"`
+	PublicKey        string `json:"public_key"`
 	ResponseTTL      string `json:"response_ttl,omitempty"`
 	AllowPubResponse string `json:"allow_pub_response,omitempty"`
 	AllowPub         string `json:"allow_pub,omitempty"`
@@ -47,19 +48,19 @@ type addAccountForm struct {
 // @Failure		400			{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500			{object}	string				"Internal error"
 func addAccount(c echo.Context) error {
-	var addCmd = lookupCommand(nsc.GetRootCmd(), "add")
-	var addAccountCmd = lookupCommand(addCmd, "account")
+	var addAccountCmd = nsc.CreateAddAccountCmd()
 
-	err := setFlagsIfInJson(addAccountCmd, &addAccountForm{}, c)
-
-	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
-		return err
-	}
-
+	a := addAccountForm{}
+	err := setFlagsIfInJson(addAccountCmd, &a, c)
 	if err != nil {
 		return badRequest(c, err)
 	}
-	if err := addAccountCmd.RunE(addAccountCmd, []string{c.FormValue("name")}); err != nil {
+
+	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
+		return badRequest(c, err)
+	}
+
+	if err := addAccountCmd.RunE(addAccountCmd, []string{a.Name}); err != nil {
 		return badRequest(c, err)
 	}
 
