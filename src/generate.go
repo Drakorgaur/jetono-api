@@ -81,6 +81,12 @@ func GenerateConfig(operatorName string) ([]byte, error) {
 	return d, nil
 }
 
+//	@Tags		Generate
+//	@Router		/generate/config [get]
+//	@Param		operator	query	string	true	"Operator name"
+//	@Summary	Sends configuration for nats server with resolver as this operator
+//	@Success	200	{object}	string	"text/plain config file"
+//	@Failure	500	{object}	string	"Internal error"
 func generateConfig(c echo.Context) error {
 
 	err, s := raiseForRequiredFlags(c.QueryParam, "operator")
@@ -101,15 +107,24 @@ func generateConfig(c echo.Context) error {
 	return c.Blob(200, "text/plain", config)
 }
 
+type storeConfigForm struct {
+	Operator string `json:"operator"`
+	Name     string `json:"name"`
+}
+
+//	@Tags		Generate
+//	@Router		/generate/config [post]
+//	@Param		json	body	storeConfigForm	true	"json body"
+//	@Summary	Stores configuration for nats server with resolver as this operator in kubernetes secret
+//	@Success	200	{object}	SimpleJSONResponse	"200 ok"
+//	@Failure	500	{object}	string				"Internal error"
 func storeConfig(c echo.Context) error {
-	vars := c.FormValue
-	err, f := raiseForRequiredFlags(vars, "operator", "name")
-	operator := vars("operator")
-	if err := nsc.GetConfig().SetOperator(operator); err != nil {
-		return badRequest(c, err)
+	s := storeConfigForm{}
+	if err := c.Bind(&s); err != nil {
+		return err
 	}
-	if err != nil {
-		return badRequest(c, fmt.Errorf("required flag %s not set", f))
+	if err := nsc.GetConfig().SetOperator(s.Operator); err != nil {
+		return badRequest(c, err)
 	}
 
 	storeT, err := storage.StoreType()
@@ -117,17 +132,17 @@ func storeConfig(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	if s, ok := storeT.(*storage.KubernetesStore); ok {
-		config, err := GenerateConfig(operator)
+	if kubeStore, ok := storeT.(*storage.KubernetesStore); ok {
+		config, err := GenerateConfig(s.Operator)
 		if err != nil {
 			return badRequest(c, err)
 		}
-		err = s.StoreSecret(
-			vars("name"),
+		err = kubeStore.StoreSecret(
+			s.Name,
 			map[string][]byte{
 				".config": config,
 			},
-			s.ConfigNs,
+			kubeStore.ConfigNs,
 		)
 		if err != nil {
 			return badRequest(c, err)
@@ -137,5 +152,5 @@ func storeConfig(c echo.Context) error {
 			Message: "config stored",
 		})
 	}
-	return badRequest(c, fmt.Errorf("storage type %s does not support config storage", storeT))
+	return badRequest(c, fmt.Errorf("storage type %kubeStore does not support config storage", storeT))
 }
