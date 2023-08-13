@@ -71,6 +71,20 @@ definitions:
       sub:
         type: string
     type: object
+  src.SecretInfo:
+    properties:
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
+  src.SecretResponse:
+    properties:
+      message:
+        type: string
+      secret:
+        $ref: '#/definitions/src.SecretInfo'
+    type: object
   src.SimpleJSONResponse:
     properties:
       message:
@@ -159,6 +173,19 @@ definitions:
       account:
         type: string
       name:
+        type: string
+    type: object
+  src.createSecretForm:
+    properties:
+      account:
+        type: string
+      namespace:
+        type: string
+      operator:
+        type: string
+      secret_name:
+        type: string
+      user:
         type: string
     type: object
   src.storeConfigForm:
@@ -798,4 +825,25 @@ paths:
       summary: List operators
       tags:
       - Operator
+  /secret:
+    post:
+      parameters:
+      - description: json body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.createSecretForm'
+      responses:
+        "200":
+          description: 200 ok
+          schema:
+            $ref: '#/definitions/src.SecretResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Creates secret with credentials
+      tags:
+      - Secret
 swagger: "2.0"
