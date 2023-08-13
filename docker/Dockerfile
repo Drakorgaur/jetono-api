@@ -9,12 +9,11 @@ COPY . .
 RUN mkdir -p /jetono-api/bin
 RUN curl -s https://raw.githubusercontent.com/objectbox/objectbox-go/main/install.sh -o install.sh
 RUN bash install.sh
-COPY ../go.mod ../go.sum /jetono-api/src/
+COPY ./go.mod ./go.sum /
 
 RUN go mod download
 
 RUN go build -o /jetono-api/bin/jetono-api
-
 
 RUN mkdir -p /store/keys /store/nsc
 

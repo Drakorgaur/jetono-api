@@ -13,6 +13,7 @@ require (
 	github.com/objectbox/objectbox-go v1.7.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
+	github.com/stoewer/go-strcase v1.2.0
 	github.com/swaggo/echo-swagger v1.4.0
 	github.com/swaggo/swag v1.16.1
 	k8s.io/api v0.27.4
