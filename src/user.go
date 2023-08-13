@@ -76,14 +76,14 @@ func addUser(c echo.Context) error {
 	})
 }
 
-// @Tags			User
-// @Router			/operator/{operator}/account/{account}/users [get]
-// @Summary		List users
-// @Param			account		path	string	true	"Account name"
-// @Param			operator	path	string	true	"Operator name"
-// @Description	Returns json list of existing users for given operator's account
-// @Success		200	{object}	[]string	"List of users for given operator's account"
-// @Failure		500	{object}	string		"Internal error"
+//	@Tags			User
+//	@Router			/operator/{operator}/account/{account}/users [get]
+//	@Summary		List users
+//	@Param			account		path	string	true	"Account name"
+//	@Param			operator	path	string	true	"Operator name"
+//	@Description	Returns json list of existing users for given operator's account
+//	@Success		200	{object}	[]string	"List of users for given operator's account"
+//	@Failure		500	{object}	string		"Internal error"
 func listUsers(c echo.Context) error {
 	nsc.GetConfig().Operator = c.Param("operator")
 	nsc.GetConfig().Account = c.Param("account")
@@ -116,15 +116,15 @@ func listUsers(c echo.Context) error {
 	return c.JSON(200, map[string][]string{"users": users})
 }
 
-// @Tags			User
-// @Router			/operator/{operator}/account/{account}/user/{name} [get]
-// @Param			name		path	string	true	"Username"
-// @Param			account		path	string	true	"Account name"
-// @Param			operator	path	string	true	"Operator name"
-// @Summary		Describes user
-// @Description	Returns json object with user description
-// @Success		200	{object}	UserDescription	"Operator description"
-// @Failure		500	{object}	string			"Internal error"
+//	@Tags			User
+//	@Router			/operator/{operator}/account/{account}/user/{name} [get]
+//	@Param			name		path	string	true	"Username"
+//	@Param			account		path	string	true	"Account name"
+//	@Param			operator	path	string	true	"Operator name"
+//	@Summary		Describes user
+//	@Description	Returns json object with user description
+//	@Success		200	{object}	UserDescription	"Operator description"
+//	@Failure		500	{object}	string			"Internal error"
 func describeUser(c echo.Context) error {
 	s, err := nsc.GetStoreForOperator(c.Param("operator"))
 	if err != nil {
@@ -173,16 +173,16 @@ func GetUserCreds(operator string, account string, user string) ([]byte, error) 
 	return d, nil
 }
 
-// @Tags		User
-// @Router		/creds/operator/{operator}/account/{account}/user/{name} [get]
-// @Summary	Generate user credentials
-// @Param		name		path	string	true	"Username"
-// @Param		account		path	string	true	"Account name"
-// @Param		operator	path	string	true	"Operator name"
-// @Description
-// @Success	200	{object}	map[string]string	"Operators list"
-// @Success	404	{object}	map[string]string	"User was not found"
-// @Failure	500	{object}	string				"Internal error"
+//	@Tags		User
+//	@Router		/creds/operator/{operator}/account/{account}/user/{name} [get]
+//	@Summary	Generate user credentials
+//	@Param		name		path	string	true	"Username"
+//	@Param		account		path	string	true	"Account name"
+//	@Param		operator	path	string	true	"Operator name"
+//	@Description
+//	@Success	200	{object}	map[string]string	"Operators list"
+//	@Success	404	{object}	map[string]string	"User was not found"
+//	@Failure	500	{object}	string				"Internal error"
 func generateUser(c echo.Context) error {
 	d, err := GetUserCreds(c.Param("operator"), c.Param("account"), c.Param("user"))
 	if err != nil {
@@ -192,15 +192,15 @@ func generateUser(c echo.Context) error {
 	return c.JSON(200, map[string]string{"creds": string(d)})
 }
 
-// @Tags			User
-// @Router			/operator/{operator}/account/{account}/user/{name} [delete]
-// @Param			name		path	string	true	"Username"
-// @Param			account		path	string	true	"Account name"
-// @Param			operator	path	string	true	"Operator name"
-// @Summary		Revokes a user
-// @Description	Revokes a user
-// @Success		200	{object}	map[string]string	"Operator description"
-// @Failure		500	{object}	string				"Internal error"
+//	@Tags			User
+//	@Router			/operator/{operator}/account/{account}/user/{name} [delete]
+//	@Param			name		path	string	true	"Username"
+//	@Param			account		path	string	true	"Account name"
+//	@Param			operator	path	string	true	"Operator name"
+//	@Summary		Revokes a user
+//	@Description	Revokes a user
+//	@Success		200	{object}	map[string]string	"Operator description"
+//	@Failure		500	{object}	string				"Internal error"
 func revokeUser(c echo.Context) error {
 	var revokeCmd = lookupCommand(nsc.GetRootCmd(), "revocations")
 	var operatorCmd = lookupCommand(revokeCmd, "add-user")

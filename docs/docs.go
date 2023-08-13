@@ -317,22 +317,27 @@ const docTemplate = `{
                 "summary": "Add user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "name",
-                        "in": "formData"
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addUserForm"
+                        }
                     },
                     {
                         "type": "string",
                         "description": "Account name",
                         "name": "account",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "Operator name",
                         "name": "operator",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -478,154 +483,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
                         "description": "add tags for user - comma separated list or option can be specified multiple times",
-                        "name": "tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove tag - comma separated list or option can be specified multiple times",
-                        "name": "rm-tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "start",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "expiry",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "` + "`" + `add start-end time range of the form ",
-                        "name": "time",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "` + "`" + `remove start-end time by start time ",
-                        "name": "rm-time",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set the locale with which time values are interpreted",
-                        "name": "locale",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add source network for connection - comma separated list or option can be specified multiple times",
-                        "name": "source-network",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove source network for connection - comma separated list or option can be specified multiple times",
-                        "name": "rm-source-network",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set\tallowed\tconnection\ttypes:\t%s\t%s\t%s\t%s\t%s\t%s\t-\tcomma\tseparated\tlist\tor\toption\tcan\tbe\tspecified\tmultiple\ttimes, jwt.ConnectionTypeLeafnode, jwt.ConnectionTypeMqtt, jwt.ConnectionTypeStandard, jwt.ConnectionTypeWebsocket, jwt.ConnectionTypeLeafnodeWS, jwt.ConnectionTypeMqttWS))",
-                        "name": "conn-type",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove connection types - comma separated list or option can be specified multiple times",
-                        "name": "rm-conn-type",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum number of subscriptions (-1 is unlimited)",
-                        "name": "subs",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum data in bytes for the user (-1 is unlimited)",
-                        "name": "data",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum message payload in bytes for the account (-1 is unlimited)",
-                        "name": "payload",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "no connect challenge required for user",
-                        "name": "bearer",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "the amount of stime sthe s%s sis svalid s(global) - s[#ms(millis) | #s(econds) | m(inutes) | h(ours)] - sDefault sis no time limit., typeName))",
-                        "name": "response-ttl",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "%s to slimit how soften sa sclient scan spublish sto sreply ssubjects\t[with an optional count, --allow-pub-response=n] (global), typeName))",
-                        "name": "allow-pub-response",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple stimes, typeName))",
-                        "name": "allow-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish sand ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified\tmultiple stimes, typeName))",
-                        "name": "allow-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add subscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified multiple stimes, typeName))",
-                        "name": "allow-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny spublish s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple\ttimes, typeName))",
-                        "name": "deny-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny spublish sand ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified multiple times, typeName))",
-                        "name": "deny-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple\ttimes, typeName))",
-                        "name": "deny-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove sresponse ssettings sfrom s%s, typeName))",
-                        "name": "rm-response-perms",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove spublish/subscribe sand sdeny s%s - comma separated\tlist or\toption can be specified multiple times, typeName))",
-                        "name": "rm",
-                        "in": "formData"
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.updateUserForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -1033,6 +897,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "public_key": {
+                    "type": "string"
+                },
                 "response_ttl": {
                     "type": "string"
                 },
@@ -1064,6 +931,17 @@ const docTemplate = `{
                 },
                 "sys": {
                     "type": "boolean"
+                }
+            }
+        },
+        "src.addUserForm": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1169,6 +1047,86 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.updateUserForm": {
+            "type": "object",
+            "properties": {
+                "allow_pub": {
+                    "type": "string"
+                },
+                "allow_pub_response": {
+                    "type": "string"
+                },
+                "allow_pubsub": {
+                    "type": "string"
+                },
+                "allow_sub": {
+                    "type": "string"
+                },
+                "bearer": {
+                    "type": "boolean"
+                },
+                "conn_type": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "deny_pub": {
+                    "type": "string"
+                },
+                "deny_pubsub": {
+                    "type": "string"
+                },
+                "deny_sub": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "string"
+                },
+                "locale": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "response_ttl": {
+                    "type": "string"
+                },
+                "rm": {
+                    "type": "string"
+                },
+                "rm_conn_type": {
+                    "type": "string"
+                },
+                "rm_response_perms": {
+                    "type": "string"
+                },
+                "rm_source_network": {
+                    "type": "string"
+                },
+                "rm_tag": {
+                    "type": "string"
+                },
+                "rm_time": {
+                    "type": "string"
+                },
+                "source_network": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "subs": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "time": {
                     "type": "string"
                 }
             }

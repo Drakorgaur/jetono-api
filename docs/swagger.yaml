@@ -130,6 +130,8 @@ definitions:
         type: string
       name:
         type: string
+      public_key:
+        type: string
       response_ttl:
         type: string
       start:
@@ -151,6 +153,13 @@ definitions:
         type: boolean
     required:
     - name
+    type: object
+  src.addUserForm:
+    properties:
+      account:
+        type: string
+      name:
+        type: string
     type: object
   src.updateAccountForm:
     properties:
@@ -220,6 +229,59 @@ definitions:
       system_account:
         type: string
       tag:
+        type: string
+    type: object
+  src.updateUserForm:
+    properties:
+      allow_pub:
+        type: string
+      allow_pub_response:
+        type: string
+      allow_pubsub:
+        type: string
+      allow_sub:
+        type: string
+      bearer:
+        type: boolean
+      conn_type:
+        type: string
+      data:
+        type: string
+      deny_pub:
+        type: string
+      deny_pubsub:
+        type: string
+      deny_sub:
+        type: string
+      expiry:
+        type: string
+      locale:
+        type: string
+      payload:
+        type: string
+      response_ttl:
+        type: string
+      rm:
+        type: string
+      rm_conn_type:
+        type: string
+      rm_response_perms:
+        type: string
+      rm_source_network:
+        type: string
+      rm_tag:
+        type: string
+      rm_time:
+        type: string
+      source_network:
+        type: string
+      start:
+        type: string
+      subs:
+        type: string
+      tag:
+        type: string
+      time:
         type: string
     type: object
   storage.AccountServerMap:
@@ -431,17 +493,21 @@ paths:
     post:
       description: Add user with given operator and account to the store
       parameters:
-      - description: Username
-        in: formData
-        name: name
-        type: string
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addUserForm'
       - description: Account name
         in: path
         name: account
+        required: true
         type: string
       - description: Operator name
         in: path
         name: operator
+        required: true
         type: string
       responses:
         "200":
@@ -542,122 +608,11 @@ paths:
         type: string
       - description: add tags for user - comma separated list or option can be specified
           multiple times
-        in: formData
-        name: tag
-        type: string
-      - description: remove tag - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-tag
-        type: string
-      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: start
-        type: string
-      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: expiry
-        type: string
-      - description: '`add start-end time range of the form '
-        in: formData
-        name: time
-        type: string
-      - description: '`remove start-end time by start time '
-        in: formData
-        name: rm-time
-        type: string
-      - description: set the locale with which time values are interpreted
-        in: formData
-        name: locale
-        type: string
-      - description: add source network for connection - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: source-network
-        type: string
-      - description: remove source network for connection - comma separated list or
-          option can be specified multiple times
-        in: formData
-        name: rm-source-network
-        type: string
-      - description: "set\tallowed\tconnection\ttypes:\t%s\t%s\t%s\t%s\t%s\t%s\t-\tcomma\tseparated\tlist\tor\toption\tcan\tbe\tspecified\tmultiple\ttimes,
-          jwt.ConnectionTypeLeafnode, jwt.ConnectionTypeMqtt, jwt.ConnectionTypeStandard,
-          jwt.ConnectionTypeWebsocket, jwt.ConnectionTypeLeafnodeWS, jwt.ConnectionTypeMqttWS))"
-        in: formData
-        name: conn-type
-        type: string
-      - description: remove connection types - comma separated list or option can
-          be specified multiple times
-        in: formData
-        name: rm-conn-type
-        type: string
-      - description: set maximum number of subscriptions (-1 is unlimited)
-        in: formData
-        name: subs
-        type: string
-      - description: set maximum data in bytes for the user (-1 is unlimited)
-        in: formData
-        name: data
-        type: string
-      - description: set maximum message payload in bytes for the account (-1 is unlimited)
-        in: formData
-        name: payload
-        type: string
-      - description: no connect challenge required for user
-        in: formData
-        name: bearer
-        type: boolean
-      - description: 'the amount of stime sthe s%s sis svalid s(global) - s[#ms(millis)
-          | #s(econds) | m(inutes) | h(ours)] - sDefault sis no time limit., typeName))'
-        in: formData
-        name: response-ttl
-        type: string
-      - description: "%s to slimit how soften sa sclient scan spublish sto sreply
-          ssubjects\t[with an optional count, --allow-pub-response=n] (global), typeName))"
-        in: formData
-        name: allow-pub-response
-        type: string
-      - description: add publish s%s s- scomma sseparated slist sor soption scan sbe
-          sspecified smultiple stimes, typeName))
-        in: formData
-        name: allow-pub
-        type: string
-      - description: "add publish sand ssubscribe s%s s- scomma sseparated slist sor
-          soption scan sbe sspecified\tmultiple stimes, typeName))"
-        in: formData
-        name: allow-pubsub
-        type: string
-      - description: add subscribe s%s s- scomma sseparated slist sor soption scan
-          sbe sspecified multiple stimes, typeName))
-        in: formData
-        name: allow-sub
-        type: string
-      - description: "add deny spublish s%s s- scomma sseparated slist sor soption
-          scan sbe sspecified smultiple\ttimes, typeName))"
-        in: formData
-        name: deny-pub
-        type: string
-      - description: add deny spublish sand ssubscribe s%s s- scomma sseparated slist
-          sor soption scan sbe sspecified multiple times, typeName))
-        in: formData
-        name: deny-pubsub
-        type: string
-      - description: "add deny ssubscribe s%s s- scomma sseparated slist sor soption
-          scan sbe sspecified smultiple\ttimes, typeName))"
-        in: formData
-        name: deny-sub
-        type: string
-      - description: remove sresponse ssettings sfrom s%s, typeName))
-        in: formData
-        name: rm-response-perms
-        type: string
-      - description: "remove spublish/subscribe sand sdeny s%s - comma separated\tlist
-          or\toption can be specified multiple times, typeName))"
-        in: formData
-        name: rm
-        type: string
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.updateUserForm'
       responses:
         "200":
           description: Status ok

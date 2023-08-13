@@ -26,14 +26,14 @@ type addOperatorForm struct {
 	Expiry             string `json:"expiry,omitempty"`
 }
 
-// @Tags			Operator
-// @Router			/operator [post]
-// @Summary		Add an operator
-// @Description	Add an operator to the store
-// @Param			json	body		addOperatorForm		true	"request body"
-// @Success		200		{object}	SimpleJSONResponse	"Operator added"
-// @Failure		400		{object}	SimpleJSONResponse	"Bad request"
-// @Failure		500		{object}	string				"Internal error"
+//	@Tags			Operator
+//	@Router			/operator [post]
+//	@Summary		Add an operator
+//	@Description	Add an operator to the store
+//	@Param			json	body		addOperatorForm		true	"request body"
+//	@Success		200		{object}	SimpleJSONResponse	"Operator added"
+//	@Failure		400		{object}	SimpleJSONResponse	"Bad request"
+//	@Failure		500		{object}	string				"Internal error"
 func addOperator(c echo.Context) error {
 	var addCmd = lookupCommand(nsc.GetRootCmd(), "add")
 	var addOperatorCmd = lookupCommand(addCmd, "operator")
@@ -53,25 +53,25 @@ func addOperator(c echo.Context) error {
 	})
 }
 
-// @Tags			Operator
-// @Router			/operators [get]
-// @Summary		List operators
-// @Description	Returns json list of existing operators
-// @Success		200	{object}	[]string	"Operators list"
-// @Failure		500	{object}	string		"Internal error"
+//	@Tags			Operator
+//	@Router			/operators [get]
+//	@Summary		List operators
+//	@Description	Returns json list of existing operators
+//	@Success		200	{object}	[]string	"Operators list"
+//	@Failure		500	{object}	string		"Internal error"
 func listOperators(c echo.Context) error {
 	operators := nsc.GetConfig().ListOperators()
 
 	return c.JSON(200, map[string][]string{"operators": operators})
 }
 
-// @Tags			Operator
-// @Router			/operator/{name} [get]
-// @Param			name	path	string	true	"Operator name"
-// @Summary		Describes an operator
-// @Description	Returns json object with operator description
-// @Success		200	{object}	OperatorDescription	"Operator description"
-// @Failure		500	{object}	string				"Internal error"
+//	@Tags			Operator
+//	@Router			/operator/{name} [get]
+//	@Param			name	path	string	true	"Operator name"
+//	@Summary		Describes an operator
+//	@Description	Returns json object with operator description
+//	@Success		200	{object}	OperatorDescription	"Operator description"
+//	@Failure		500	{object}	string				"Internal error"
 func describeOperator(c echo.Context) error {
 	s, err := nsc.GetStoreForOperator(c.Param("name"))
 	if err != nil {
@@ -105,14 +105,14 @@ type updateOperatorForm struct {
 	RmAccountJwtServerUrl string `json:"rm_account_jwt_server_url,omitempty"`
 }
 
-// @Tags			Operator
-// @Router			/operator/{name} [patch]
-// @Param			name	path	string				true	"Operator name"
-// @Param			json	body	updateOperatorForm	true	"request body"
-// @Summary		Updates an operator
-// @Description	Updates an operator and returns json with status ok if successful
-// @Success		200	{object}	SimpleJSONResponse	"Status ok"
-// @Failure		500	{object}	string				"Internal error"
+//	@Tags			Operator
+//	@Router			/operator/{name} [patch]
+//	@Param			name	path	string				true	"Operator name"
+//	@Param			json	body	updateOperatorForm	true	"request body"
+//	@Summary		Updates an operator
+//	@Description	Updates an operator and returns json with status ok if successful
+//	@Success		200	{object}	SimpleJSONResponse	"Status ok"
+//	@Failure		500	{object}	string				"Internal error"
 func updateOperator(c echo.Context) error {
 	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
 	var updateOperatorCmd = lookupCommand(updateCmd, "operator")
