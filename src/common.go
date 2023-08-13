@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/fatih/structs"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/stoewer/go-strcase"
 )
 
 func initInfo(value string) {
@@ -23,7 +25,7 @@ func badRequest(c echo.Context, err error) error {
 	})
 }
 
-// copied from source.
+// copied from source. (nsc)
 func bodyAsJson(data []byte) ([]byte, error) {
 	chunks := bytes.Split(data, []byte{'.'})
 	if len(chunks) != 3 {
@@ -58,6 +60,42 @@ func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []s
 			_ = val.Replace([]string{value})
 		} else {
 			_ = f.Value.Set(value)
+		}
+	}
+	return nil
+}
+
+func setFlagsIfInJson(cmd *cobra.Command, s interface{}, ctx echo.Context) error {
+	if err := ctx.Bind(&s); err != nil {
+		return err
+	}
+	m := structs.Map(s)
+
+	for flag, value := range m {
+		if value == nil || value == "" {
+			continue
+		}
+		formatterFlagName := strcase.KebabCase(flag)
+		f := cmd.Flag(formatterFlagName)
+		if f == nil {
+			return fmt.Errorf("flag %s not found", formatterFlagName)
+		}
+		f.Changed = true
+		var finalValue string
+		if val, ok := value.(string); ok {
+			finalValue = val
+		}
+		if val, ok := value.(int); ok {
+			finalValue = fmt.Sprintf("%d", val)
+		}
+		if val, ok := value.(bool); ok {
+			finalValue = fmt.Sprintf("%t", val)
+		}
+
+		if val, ok := f.Value.(pflag.SliceValue); ok {
+			_ = val.Replace([]string{finalValue})
+		} else {
+			_ = f.Value.Set(finalValue)
 		}
 	}
 	return nil

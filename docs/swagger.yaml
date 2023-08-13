@@ -71,6 +71,20 @@ definitions:
       sub:
         type: string
     type: object
+  src.SecretInfo:
+    properties:
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
+  src.SecretResponse:
+    properties:
+      message:
+        type: string
+      secret:
+        $ref: '#/definitions/src.SecretInfo'
+    type: object
   src.SimpleJSONResponse:
     properties:
       message:
@@ -110,6 +124,209 @@ definitions:
       sub:
         type: string
     type: object
+  src.addAccountForm:
+    properties:
+      allow_pub:
+        type: string
+      allow_pub_response:
+        type: string
+      allow_pubsub:
+        type: string
+      allow_sub:
+        type: string
+      deny_pub:
+        type: string
+      deny_pubsub:
+        type: string
+      deny_sub:
+        type: string
+      expiry:
+        type: string
+      name:
+        type: string
+      public_key:
+        type: string
+      response_ttl:
+        type: string
+      start:
+        type: string
+    type: object
+  src.addOperatorForm:
+    properties:
+      expiry:
+        type: string
+      force:
+        type: boolean
+      generate_signing_key:
+        type: boolean
+      name:
+        type: string
+      start:
+        type: string
+      sys:
+        type: boolean
+    required:
+    - name
+    type: object
+  src.addUserForm:
+    properties:
+      account:
+        type: string
+      name:
+        type: string
+    type: object
+  src.createSecretForm:
+    properties:
+      account:
+        type: string
+      namespace:
+        type: string
+      operator:
+        type: string
+      secret_name:
+        type: string
+      user:
+        type: string
+    type: object
+  src.storeConfigForm:
+    properties:
+      name:
+        type: string
+      operator:
+        type: string
+    type: object
+  src.updateAccountForm:
+    properties:
+      conns:
+        type: string
+      data:
+        type: string
+      description:
+        type: string
+      disallow_bearer:
+        type: boolean
+      exports:
+        type: string
+      imports:
+        type: string
+      info_url:
+        type: string
+      js_consumer:
+        type: string
+      js_disk_storage:
+        type: string
+      js_max_ack_pending:
+        type: string
+      js_max_bytes_required:
+        type: string
+      js_max_disk_stream:
+        type: string
+      js_max_mem_stream:
+        type: string
+      js_mem_storage:
+        type: string
+      js_streams:
+        type: string
+      js_tier:
+        type: string
+      leaf_conns:
+        type: string
+      payload:
+        type: string
+      rm_js_tier:
+        type: string
+      rm_sk:
+        type: string
+      rm_tag:
+        type: string
+      subscriptions:
+        type: string
+      tag:
+        type: string
+      wildcard_exports:
+        type: boolean
+    type: object
+  src.updateOperatorForm:
+    properties:
+      account_jwt_server_url:
+        type: string
+      require_signing_keys:
+        type: boolean
+      rm_account_jwt_server_url:
+        type: string
+      rm_service_url:
+        type: string
+      rm_tag:
+        type: string
+      service_url:
+        type: string
+      system_account:
+        type: string
+      tag:
+        type: string
+    type: object
+  src.updateUserForm:
+    properties:
+      allow_pub:
+        type: string
+      allow_pub_response:
+        type: string
+      allow_pubsub:
+        type: string
+      allow_sub:
+        type: string
+      bearer:
+        type: boolean
+      conn_type:
+        type: string
+      data:
+        type: string
+      deny_pub:
+        type: string
+      deny_pubsub:
+        type: string
+      deny_sub:
+        type: string
+      expiry:
+        type: string
+      locale:
+        type: string
+      payload:
+        type: string
+      response_ttl:
+        type: string
+      rm:
+        type: string
+      rm_conn_type:
+        type: string
+      rm_response_perms:
+        type: string
+      rm_source_network:
+        type: string
+      rm_tag:
+        type: string
+      rm_time:
+        type: string
+      source_network:
+        type: string
+      start:
+        type: string
+      subs:
+        type: string
+      tag:
+        type: string
+      time:
+        type: string
+    type: object
+  storage.AccountServerMap:
+    properties:
+      account:
+        type: string
+      operator:
+        type: string
+      servers:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -144,21 +361,12 @@ paths:
     post:
       description: Returns json with confirmation
       parameters:
-      - description: Account name
-        in: formData
-        name: account
+      - description: json
+        in: body
+        name: json
         required: true
-        type: string
-      - description: Operator name
-        in: formData
-        name: operator
-        required: true
-        type: string
-      - description: Operator name
-        in: formData
-        name: servers
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/storage.AccountServerMap'
       responses:
         "200":
           description: Operator description
@@ -211,38 +419,57 @@ paths:
       summary: Generate user credentials
       tags:
       - User
+  /generate/config:
+    get:
+      parameters:
+      - description: Operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: text/plain config file
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Sends configuration for nats server with resolver as this operator
+      tags:
+      - Generate
+    post:
+      parameters:
+      - description: json body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.storeConfigForm'
+      responses:
+        "200":
+          description: 200 ok
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Stores configuration for nats server with resolver as this operator
+        in kubernetes secret
+      tags:
+      - Generate
   /operator:
     post:
       description: Add an operator to the store
       parameters:
-      - description: Operator name
-        in: formData
-        name: name
+      - description: request body
+        in: body
+        name: json
         required: true
-        type: string
-      - description: generate a signing key with the operator
-        in: formData
-        name: generate-signing-key
-        type: boolean
-      - description: generate system account with the operator (if specified will
-          be signed with signing key)
-        in: formData
-        name: sys
-        type: boolean
-      - description: on import, overwrite existing when already present
-        in: formData
-        name: force
-        type: boolean
-      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: start
-        type: string
-      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: expiry
-        type: string
+        schema:
+          $ref: '#/definitions/src.addOperatorForm'
       responses:
         "200":
           description: Operator added
@@ -288,43 +515,12 @@ paths:
         name: name
         required: true
         type: string
-      - description: add tags for user - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: tag
-        type: string
-      - description: remove tag - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-tag
-        type: string
-      - description: set account jwt server url for nsc sync (only http/https/nats
-          urls supported if updating with nsc)
-        in: formData
-        name: account-jwt-server-url
-        type: string
-      - description: set system account by account by public key or name
-        in: formData
-        name: system-account
-        type: string
-      - description: add an operator service url - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: service-url
-        type: string
-      - description: remove an operator service url - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: rm-service-url
-        type: string
-      - description: require accounts/user to be signed with a signing key
-        in: formData
-        name: require-signing-keys
-        type: boolean
-      - description: clear account server url
-        in: formData
-        name: rm-account-jwt-server-url
-        type: string
+      - description: request body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.updateOperatorForm'
       responses:
         "200":
           description: Status ok
@@ -341,67 +537,17 @@ paths:
     post:
       description: Add an account with given operator to the store
       parameters:
-      - description: Account name
-        in: formData
-        name: name
-        required: true
-        type: string
       - description: Operator name
         in: path
         name: operator
         required: true
         type: string
-      - description: 'the amount of time the default permission is valid (global)
-          - [#ms(millis) | #s(econds) | m(inutes) | h(ours)] - Default is no time
-          limit.'
-        in: formData
-        name: response-ttl
-        type: string
-      - description: '%s to limit how often a client can publish to reply subjects
-          [with an optional count, --allow-pub-response=n] (global)'
-        in: formData
-        name: allow-pub-response
-        type: string
-      - description: add publish %s - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: allow-pub
-        type: string
-      - description: add publish and subscribe %s - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: allow-pubsub
-        type: string
-      - description: add subscribe %s - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: allow-sub
-        type: string
-      - description: add deny publish %s - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: deny-pub
-        type: string
-      - description: add deny publish and subscribe %s - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: deny-pubsub
-        type: string
-      - description: add deny subscribe %s - comma separated list or option can be
-          specified multiple times
-        in: formData
-        name: deny-sub
-        type: string
-      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: start
-        type: string
-      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: expiry
-        type: string
+      - description: Account data in json format
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addAccountForm'
       responses:
         "200":
           description: Account added
@@ -422,17 +568,21 @@ paths:
     post:
       description: Add user with given operator and account to the store
       parameters:
-      - description: Username
-        in: formData
-        name: name
-        type: string
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addUserForm'
       - description: Account name
         in: path
         name: account
+        required: true
         type: string
       - description: Operator name
         in: path
         name: operator
+        required: true
         type: string
       responses:
         "200":
@@ -533,122 +683,11 @@ paths:
         type: string
       - description: add tags for user - comma separated list or option can be specified
           multiple times
-        in: formData
-        name: tag
-        type: string
-      - description: remove tag - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-tag
-        type: string
-      - description: 'valid from (''0'' is always, ''3d'' is three days) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: start
-        type: string
-      - description: 'valid until (''0'' is always, ''2M'' is two months) - yyyy-mm-dd,
-          #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)'
-        in: formData
-        name: expiry
-        type: string
-      - description: '`add start-end time range of the form '
-        in: formData
-        name: time
-        type: string
-      - description: '`remove start-end time by start time '
-        in: formData
-        name: rm-time
-        type: string
-      - description: set the locale with which time values are interpreted
-        in: formData
-        name: locale
-        type: string
-      - description: add source network for connection - comma separated list or option
-          can be specified multiple times
-        in: formData
-        name: source-network
-        type: string
-      - description: remove source network for connection - comma separated list or
-          option can be specified multiple times
-        in: formData
-        name: rm-source-network
-        type: string
-      - description: "set\tallowed\tconnection\ttypes:\t%s\t%s\t%s\t%s\t%s\t%s\t-\tcomma\tseparated\tlist\tor\toption\tcan\tbe\tspecified\tmultiple\ttimes,
-          jwt.ConnectionTypeLeafnode, jwt.ConnectionTypeMqtt, jwt.ConnectionTypeStandard,
-          jwt.ConnectionTypeWebsocket, jwt.ConnectionTypeLeafnodeWS, jwt.ConnectionTypeMqttWS))"
-        in: formData
-        name: conn-type
-        type: string
-      - description: remove connection types - comma separated list or option can
-          be specified multiple times
-        in: formData
-        name: rm-conn-type
-        type: string
-      - description: set maximum number of subscriptions (-1 is unlimited)
-        in: formData
-        name: subs
-        type: string
-      - description: set maximum data in bytes for the user (-1 is unlimited)
-        in: formData
-        name: data
-        type: string
-      - description: set maximum message payload in bytes for the account (-1 is unlimited)
-        in: formData
-        name: payload
-        type: string
-      - description: no connect challenge required for user
-        in: formData
-        name: bearer
-        type: boolean
-      - description: 'the amount of stime sthe s%s sis svalid s(global) - s[#ms(millis)
-          | #s(econds) | m(inutes) | h(ours)] - sDefault sis no time limit., typeName))'
-        in: formData
-        name: response-ttl
-        type: string
-      - description: "%s to slimit how soften sa sclient scan spublish sto sreply
-          ssubjects\t[with an optional count, --allow-pub-response=n] (global), typeName))"
-        in: formData
-        name: allow-pub-response
-        type: string
-      - description: add publish s%s s- scomma sseparated slist sor soption scan sbe
-          sspecified smultiple stimes, typeName))
-        in: formData
-        name: allow-pub
-        type: string
-      - description: "add publish sand ssubscribe s%s s- scomma sseparated slist sor
-          soption scan sbe sspecified\tmultiple stimes, typeName))"
-        in: formData
-        name: allow-pubsub
-        type: string
-      - description: add subscribe s%s s- scomma sseparated slist sor soption scan
-          sbe sspecified multiple stimes, typeName))
-        in: formData
-        name: allow-sub
-        type: string
-      - description: "add deny spublish s%s s- scomma sseparated slist sor soption
-          scan sbe sspecified smultiple\ttimes, typeName))"
-        in: formData
-        name: deny-pub
-        type: string
-      - description: add deny spublish sand ssubscribe s%s s- scomma sseparated slist
-          sor soption scan sbe sspecified multiple times, typeName))
-        in: formData
-        name: deny-pubsub
-        type: string
-      - description: "add deny ssubscribe s%s s- scomma sseparated slist sor soption
-          scan sbe sspecified smultiple\ttimes, typeName))"
-        in: formData
-        name: deny-sub
-        type: string
-      - description: remove sresponse ssettings sfrom s%s, typeName))
-        in: formData
-        name: rm-response-perms
-        type: string
-      - description: "remove spublish/subscribe sand sdeny s%s - comma separated\tlist
-          or\toption can be specified multiple times, typeName))"
-        in: formData
-        name: rm
-        type: string
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.updateUserForm'
       responses:
         "200":
           description: Status ok
@@ -728,118 +767,12 @@ paths:
         name: operator
         required: true
         type: string
-      - description: add tags for user - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: tag
-        type: string
-      - description: remove tag - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-tag
-        type: string
-      - description: set maximum active connections for the account (-1 is unlimited)
-        in: formData
-        name: conns
-        type: string
-      - description: set maximum active leaf node connections for the account (-1
-          is unlimited)
-        in: formData
-        name: leaf-conns
-        type: string
-      - description: set maximum data in bytes for the account (-1 is unlimited)
-        in: formData
-        name: data
-        type: string
-      - description: set maximum number of exports for the account (-1 is unlimited)
-        in: formData
-        name: exports
-        type: string
-      - description: set maximum number of imports for the account (-1 is unlimited)
-        in: formData
-        name: imports
-        type: string
-      - description: set maximum message payload in bytes for the account (-1 is unlimited)
-        in: formData
-        name: payload
-        type: string
-      - description: set maximum subscription for the account (-1 is unlimited)
-        in: formData
-        name: subscriptions
-        type: string
-      - description: exports can contain wildcards
-        in: formData
-        name: wildcard-exports
-        type: boolean
-      - description: require user jwt to not be bearer token
-        in: formData
-        name: disallow-bearer
-        type: boolean
-      - description: remove signing key - comma separated list or option can be specified
-          multiple times
-        in: formData
-        name: rm-sk
-        type: string
-      - description: Description for this account
-        in: formData
-        name: description
-        type: string
-      - description: Link for more info on this account
-        in: formData
-        name: info-url
-        type: string
-      - description: 'JetStream: replication tier (0 creates a configuration that
-          applies to all assets) '
-        in: formData
-        name: js-tier
-        type: string
-      - description: 'JetStream: remove replication limits for the specified tier
-          (0 is the global tier) this flag is exclusive of all other js flags'
-        in: formData
-        name: rm-js-tier
-        type: string
-      - description: 'JetStream: set maximum memory storage in bytes for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-mem-storage
-        type: string
-      - description: 'JetStream: set maximum disk storage in bytes for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-disk-storage
-        type: string
-      - description: 'JetStream: set maximum streams for the account (-1 is unlimited)'
-        in: formData
-        name: js-streams
-        type: string
-      - description: 'JetStream: set maximum consumer for the account (-1 is unlimited)'
-        in: formData
-        name: js-consumer
-        type: string
-      - description: 'JetStream: set maximum size of a memory stream for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-max-mem-stream
-        type: string
-      - description: 'JetStream: set maximum size of a disk stream for the account
-          (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)'
-        in: formData
-        name: js-max-disk-stream
-        type: string
-      - description: 'JetStream: set whether max stream is required when creating
-          a stream'
-        in: formData
-        name: js-max-bytes-required
-        type: string
-      - description: 'JetStream: set number of maximum acks that can be pending for
-          a consumer in the account'
-        in: formData
-        name: js-max-ack-pending
-        type: string
-      - description: account to edit
-        in: formData
-        name: name
-        type: string
+      - description: Account data in json format
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.updateAccountForm'
       responses:
         "200":
           description: Status ok
@@ -892,4 +825,25 @@ paths:
       summary: List operators
       tags:
       - Operator
+  /secret:
+    post:
+      parameters:
+      - description: json body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.createSecretForm'
+      responses:
+        "200":
+          description: 200 ok
+          schema:
+            $ref: '#/definitions/src.SecretResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Creates secret with credentials
+      tags:
+      - Secret
 swagger: "2.0"

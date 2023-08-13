@@ -53,25 +53,13 @@
                 "summary": "Bind context to account",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Account name",
-                        "name": "account",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Operator name",
-                        "name": "operator",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Operator name",
-                        "name": "servers",
-                        "in": "formData",
-                        "required": true
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.AccountServerMap"
+                        }
                     }
                 ],
                 "responses": {
@@ -150,6 +138,68 @@
                 }
             }
         },
+        "/generate/config": {
+            "get": {
+                "tags": [
+                    "Generate"
+                ],
+                "summary": "Sends configuration for nats server with resolver as this operator",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "text/plain config file",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Generate"
+                ],
+                "summary": "Stores configuration for nats server with resolver as this operator in kubernetes secret",
+                "parameters": [
+                    {
+                        "description": "json body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.storeConfigForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 ok",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/operator": {
             "post": {
                 "description": "Add an operator to the store",
@@ -159,41 +209,13 @@
                 "summary": "Add an operator",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Operator name",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "generate a signing key with the operator",
-                        "name": "generate-signing-key",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "generate system account with the operator (if specified will be signed with signing key)",
-                        "name": "sys",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "on import, overwrite existing when already present",
-                        "name": "force",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "start",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "expiry",
-                        "in": "formData"
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addOperatorForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -264,52 +286,13 @@
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "add tags for user - comma separated list or option can be specified multiple times",
-                        "name": "tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove tag - comma separated list or option can be specified multiple times",
-                        "name": "rm-tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set account jwt server url for nsc sync (only http/https/nats urls supported if updating with nsc)",
-                        "name": "account-jwt-server-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set system account by account by public key or name",
-                        "name": "system-account",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add an operator service url - comma separated list or option can be specified multiple times",
-                        "name": "service-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove an operator service url - comma separated list or option can be specified multiple times",
-                        "name": "rm-service-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "require accounts/user to be signed with a signing key",
-                        "name": "require-signing-keys",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "clear account server url",
-                        "name": "rm-account-jwt-server-url",
-                        "in": "formData"
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.updateOperatorForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -338,77 +321,19 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account name",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Operator name",
                         "name": "operator",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "the amount of time the default permission is valid (global) - [#ms(millis) | #s(econds) | m(inutes) | h(ours)] - Default is no time limit.",
-                        "name": "response-ttl",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "%s to limit how often a client can publish to reply subjects [with an optional count, --allow-pub-response=n] (global)",
-                        "name": "allow-pub-response",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish %s - comma separated list or option can be specified multiple times",
-                        "name": "allow-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish and subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "allow-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "allow-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny publish %s - comma separated list or option can be specified multiple times",
-                        "name": "deny-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny publish and subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "deny-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny subscribe %s - comma separated list or option can be specified multiple times",
-                        "name": "deny-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "start",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "expiry",
-                        "in": "formData"
+                        "description": "Account data in json format",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addAccountForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -442,22 +367,27 @@
                 "summary": "Add user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "name",
-                        "in": "formData"
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addUserForm"
+                        }
                     },
                     {
                         "type": "string",
                         "description": "Account name",
                         "name": "account",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "Operator name",
                         "name": "operator",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -603,154 +533,13 @@
                         "required": true
                     },
                     {
-                        "type": "string",
                         "description": "add tags for user - comma separated list or option can be specified multiple times",
-                        "name": "tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove tag - comma separated list or option can be specified multiple times",
-                        "name": "rm-tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid from ('0' is always, '3d' is three days) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "start",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "valid until ('0' is always, '2M' is two months) - yyyy-mm-dd, #m(inutes), #h(ours), #d(ays), #w(eeks), #M(onths), #y(ears)",
-                        "name": "expiry",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "`add start-end time range of the form ",
-                        "name": "time",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "`remove start-end time by start time ",
-                        "name": "rm-time",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set the locale with which time values are interpreted",
-                        "name": "locale",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add source network for connection - comma separated list or option can be specified multiple times",
-                        "name": "source-network",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove source network for connection - comma separated list or option can be specified multiple times",
-                        "name": "rm-source-network",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set\tallowed\tconnection\ttypes:\t%s\t%s\t%s\t%s\t%s\t%s\t-\tcomma\tseparated\tlist\tor\toption\tcan\tbe\tspecified\tmultiple\ttimes, jwt.ConnectionTypeLeafnode, jwt.ConnectionTypeMqtt, jwt.ConnectionTypeStandard, jwt.ConnectionTypeWebsocket, jwt.ConnectionTypeLeafnodeWS, jwt.ConnectionTypeMqttWS))",
-                        "name": "conn-type",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove connection types - comma separated list or option can be specified multiple times",
-                        "name": "rm-conn-type",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum number of subscriptions (-1 is unlimited)",
-                        "name": "subs",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum data in bytes for the user (-1 is unlimited)",
-                        "name": "data",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum message payload in bytes for the account (-1 is unlimited)",
-                        "name": "payload",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "no connect challenge required for user",
-                        "name": "bearer",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "the amount of stime sthe s%s sis svalid s(global) - s[#ms(millis) | #s(econds) | m(inutes) | h(ours)] - sDefault sis no time limit., typeName))",
-                        "name": "response-ttl",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "%s to slimit how soften sa sclient scan spublish sto sreply ssubjects\t[with an optional count, --allow-pub-response=n] (global), typeName))",
-                        "name": "allow-pub-response",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple stimes, typeName))",
-                        "name": "allow-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add publish sand ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified\tmultiple stimes, typeName))",
-                        "name": "allow-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add subscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified multiple stimes, typeName))",
-                        "name": "allow-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny spublish s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple\ttimes, typeName))",
-                        "name": "deny-pub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny spublish sand ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified multiple times, typeName))",
-                        "name": "deny-pubsub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "add deny ssubscribe s%s s- scomma sseparated slist sor soption scan sbe sspecified smultiple\ttimes, typeName))",
-                        "name": "deny-sub",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove sresponse ssettings sfrom s%s, typeName))",
-                        "name": "rm-response-perms",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove spublish/subscribe sand sdeny s%s - comma separated\tlist or\toption can be specified multiple times, typeName))",
-                        "name": "rm",
-                        "in": "formData"
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.updateUserForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -871,154 +660,13 @@
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "add tags for user - comma separated list or option can be specified multiple times",
-                        "name": "tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove tag - comma separated list or option can be specified multiple times",
-                        "name": "rm-tag",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum active connections for the account (-1 is unlimited)",
-                        "name": "conns",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum active leaf node connections for the account (-1 is unlimited)",
-                        "name": "leaf-conns",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum data in bytes for the account (-1 is unlimited)",
-                        "name": "data",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum number of exports for the account (-1 is unlimited)",
-                        "name": "exports",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum number of imports for the account (-1 is unlimited)",
-                        "name": "imports",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum message payload in bytes for the account (-1 is unlimited)",
-                        "name": "payload",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "set maximum subscription for the account (-1 is unlimited)",
-                        "name": "subscriptions",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "exports can contain wildcards",
-                        "name": "wildcard-exports",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "require user jwt to not be bearer token",
-                        "name": "disallow-bearer",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "remove signing key - comma separated list or option can be specified multiple times",
-                        "name": "rm-sk",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Description for this account",
-                        "name": "description",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Link for more info on this account",
-                        "name": "info-url",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: replication tier (0 creates a configuration that applies to all assets) ",
-                        "name": "js-tier",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: remove replication limits for the specified tier (0 is the global tier) this flag is exclusive of all other js flags",
-                        "name": "rm-js-tier",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum memory storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-mem-storage",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum disk storage in bytes for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-disk-storage",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum streams for the account (-1 is unlimited)",
-                        "name": "js-streams",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum consumer for the account (-1 is unlimited)",
-                        "name": "js-consumer",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum size of a memory stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-max-mem-stream",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set maximum size of a disk stream for the account (-1 is unlimited / 0 disabled) (units: k/m/g/t kib/mib/gib/tib)",
-                        "name": "js-max-disk-stream",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set whether max stream is required when creating a stream",
-                        "name": "js-max-bytes-required",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "JetStream: set number of maximum acks that can be pending for a consumer in the account",
-                        "name": "js-max-ack-pending",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "account to edit",
-                        "name": "name",
-                        "in": "formData"
+                        "description": "Account data in json format",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.updateAccountForm"
+                        }
                     }
                 ],
                 "responses": {
@@ -1087,6 +735,39 @@
                             "items": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/secret": {
+            "post": {
+                "tags": [
+                    "Secret"
+                ],
+                "summary": "Creates secret with credentials",
+                "parameters": [
+                    {
+                        "description": "json body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.createSecretForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 ok",
+                        "schema": {
+                            "$ref": "#/definitions/src.SecretResponse"
                         }
                     },
                     "500": {
@@ -1210,6 +891,28 @@
                 }
             }
         },
+        "src.SecretInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.SecretResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "secret": {
+                    "$ref": "#/definitions/src.SecretInfo"
+                }
+            }
+        },
         "src.SimpleJSONResponse": {
             "type": "object",
             "properties": {
@@ -1265,6 +968,315 @@
                     }
                 },
                 "sub": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.addAccountForm": {
+            "type": "object",
+            "properties": {
+                "allow_pub": {
+                    "type": "string"
+                },
+                "allow_pub_response": {
+                    "type": "string"
+                },
+                "allow_pubsub": {
+                    "type": "string"
+                },
+                "allow_sub": {
+                    "type": "string"
+                },
+                "deny_pub": {
+                    "type": "string"
+                },
+                "deny_pubsub": {
+                    "type": "string"
+                },
+                "deny_sub": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "public_key": {
+                    "type": "string"
+                },
+                "response_ttl": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.addOperatorForm": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "expiry": {
+                    "type": "string"
+                },
+                "force": {
+                    "type": "boolean"
+                },
+                "generate_signing_key": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "sys": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "src.addUserForm": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.createSecretForm": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                },
+                "secret_name": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.storeConfigForm": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.updateAccountForm": {
+            "type": "object",
+            "properties": {
+                "conns": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "disallow_bearer": {
+                    "type": "boolean"
+                },
+                "exports": {
+                    "type": "string"
+                },
+                "imports": {
+                    "type": "string"
+                },
+                "info_url": {
+                    "type": "string"
+                },
+                "js_consumer": {
+                    "type": "string"
+                },
+                "js_disk_storage": {
+                    "type": "string"
+                },
+                "js_max_ack_pending": {
+                    "type": "string"
+                },
+                "js_max_bytes_required": {
+                    "type": "string"
+                },
+                "js_max_disk_stream": {
+                    "type": "string"
+                },
+                "js_max_mem_stream": {
+                    "type": "string"
+                },
+                "js_mem_storage": {
+                    "type": "string"
+                },
+                "js_streams": {
+                    "type": "string"
+                },
+                "js_tier": {
+                    "type": "string"
+                },
+                "leaf_conns": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "rm_js_tier": {
+                    "type": "string"
+                },
+                "rm_sk": {
+                    "type": "string"
+                },
+                "rm_tag": {
+                    "type": "string"
+                },
+                "subscriptions": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "wildcard_exports": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "src.updateOperatorForm": {
+            "type": "object",
+            "properties": {
+                "account_jwt_server_url": {
+                    "type": "string"
+                },
+                "require_signing_keys": {
+                    "type": "boolean"
+                },
+                "rm_account_jwt_server_url": {
+                    "type": "string"
+                },
+                "rm_service_url": {
+                    "type": "string"
+                },
+                "rm_tag": {
+                    "type": "string"
+                },
+                "service_url": {
+                    "type": "string"
+                },
+                "system_account": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.updateUserForm": {
+            "type": "object",
+            "properties": {
+                "allow_pub": {
+                    "type": "string"
+                },
+                "allow_pub_response": {
+                    "type": "string"
+                },
+                "allow_pubsub": {
+                    "type": "string"
+                },
+                "allow_sub": {
+                    "type": "string"
+                },
+                "bearer": {
+                    "type": "boolean"
+                },
+                "conn_type": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "deny_pub": {
+                    "type": "string"
+                },
+                "deny_pubsub": {
+                    "type": "string"
+                },
+                "deny_sub": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "string"
+                },
+                "locale": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "response_ttl": {
+                    "type": "string"
+                },
+                "rm": {
+                    "type": "string"
+                },
+                "rm_conn_type": {
+                    "type": "string"
+                },
+                "rm_response_perms": {
+                    "type": "string"
+                },
+                "rm_source_network": {
+                    "type": "string"
+                },
+                "rm_tag": {
+                    "type": "string"
+                },
+                "rm_time": {
+                    "type": "string"
+                },
+                "source_network": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "subs": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "storage.AccountServerMap": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                },
+                "servers": {
                     "type": "string"
                 }
             }

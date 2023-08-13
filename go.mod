@@ -3,8 +3,12 @@ module github.com/Drakorgaur/jetono-api
 go 1.20
 
 require (
+	github.com/fatih/structs v1.1.0
+	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/nats-io/jwt/v2 v2.4.1
+	github.com/nats-io/nats.go v1.16.0
+	github.com/nats-io/nkeys v0.4.4
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
 	github.com/objectbox/objectbox-go v1.7.0
 	github.com/spf13/cobra v1.7.0
@@ -21,7 +25,6 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/briandowns/spinner v1.23.0 // indirect
-	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
@@ -35,7 +38,6 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/flatbuffers v23.5.26+incompatible // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
@@ -60,12 +62,9 @@ require (
 	github.com/nats-io/cliprompts/v2 v2.0.0-20191226174129-372d79b36768 // indirect
 	github.com/nats-io/jsm.go v0.0.33 // indirect
 	github.com/nats-io/jwt v1.2.3-0.20210314221642-a826c77dc9d2 // indirect
-	github.com/nats-io/nats.go v1.16.0 // indirect
-	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/objectbox/objectbox-generator v0.13.0 // indirect
 	github.com/rhysd/go-github-selfupdate v1.2.2 // indirect
-	github.com/russross/blackfriday v1.5.2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect

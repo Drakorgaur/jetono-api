@@ -13,7 +13,6 @@ type Storage interface {
 type AccountServerMap struct {
 	Operator    string `objectbox:"-" json:"operator"`
 	Account     string `objectbox:"-" json:"account"`
-	User        string `objectbox:"-" json:"user"`
 	ServersList string `json:"servers"`
 }
 

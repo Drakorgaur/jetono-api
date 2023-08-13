@@ -22,32 +22,40 @@ type SecretResponse struct {
 	Secret  SecretInfo `json:"secret"`
 }
 
+type createSecretForm struct {
+	Operator   string `json:"operator"`
+	Account    string `json:"account"`
+	User       string `json:"user"`
+	SecretName string `json:"secret_name"`
+	Namespace  string `json:"namespace"`
+}
+
+//	@Tags		Secret
+//	@Router		/secret [post]
+//	@Param		json	body	createSecretForm	true	"json body"
+//	@Summary	Creates secret with credentials
+//	@Success	200	{object}	SecretResponse	"200 ok"
+//	@Failure	500	{object}	string			"Internal error"
 func createSecret(c echo.Context) error {
-	if err, s := raiseForRequiredFlags(c.FormValue, "operator", "account", "user"); err != nil {
-		return c.JSON(400, map[string]string{"error": err.Error(), "field required": s})
+	s := &createSecretForm{
+		Namespace:  "default",
+		SecretName: "",
+	}
+	if err := c.Bind(&s); err != nil {
+		return badRequest(c, err)
 	}
 
-	ns := c.FormValue("namespace")
-	if ns == "" {
-		ns = "default"
-	}
+	creds, err := GetUserCreds(s.Operator, s.Account, s.User)
 
-	secretName := c.FormValue("secret_name")
-
-	operator := c.FormValue("operator")
-	account := c.FormValue("account")
-	user := c.FormValue("user")
-	creds, err := GetUserCreds(operator, account, user)
-
-	if secretName == "" {
-		secretName = fmt.Sprintf("%s.%s.%s.creds", storage.Slugify(operator), storage.Slugify(account), storage.Slugify(user))
+	if s.SecretName == "" {
+		s.SecretName = fmt.Sprintf("%s.%s.%s.creds", storage.Slugify(s.Operator), storage.Slugify(s.Account), storage.Slugify(s.User))
 	}
 
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	secret, err := createSecretWithCredentials(secretName, ns, map[string][]byte{"creds": creds})
+	secret, err := createSecretWithCredentials(s.SecretName, s.Namespace, map[string][]byte{"creds": creds})
 	if err != nil {
 		return badRequest(c, err)
 	}
