@@ -93,7 +93,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/creds/operator/{operator}/account/{account}/user/{name}": {
+        "/creds/operator/{operator}/account/{account}/user/{user}": {
             "get": {
                 "tags": [
                     "User"
@@ -103,7 +103,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Username",
-                        "name": "name",
+                        "name": "user",
                         "in": "path",
                         "required": true
                     },

@@ -381,12 +381,12 @@ paths:
       summary: Bind context to account
       tags:
       - Account
-  /creds/operator/{operator}/account/{account}/user/{name}:
+  /creds/operator/{operator}/account/{account}/user/{user}:
     get:
       parameters:
       - description: Username
         in: path
-        name: name
+        name: user
         required: true
         type: string
       - description: Account name
