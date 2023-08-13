@@ -31,11 +31,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          {{- if .Values.explicitImage }}
-          image: {{ .Values.explicitImage | quote }}
-          {{- else }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          {{- end }}
+          image: {{ .Values.werf.image.jetono_api }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
