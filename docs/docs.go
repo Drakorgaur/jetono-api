@@ -757,6 +757,39 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/secret": {
+            "post": {
+                "tags": [
+                    "Secret"
+                ],
+                "summary": "Creates secret with credentials",
+                "parameters": [
+                    {
+                        "description": "json body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.createSecretForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 ok",
+                        "schema": {
+                            "$ref": "#/definitions/src.SecretResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -867,6 +900,28 @@ const docTemplate = `{
                 },
                 "sub": {
                     "type": "string"
+                }
+            }
+        },
+        "src.SecretInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.SecretResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "secret": {
+                    "$ref": "#/definitions/src.SecretInfo"
                 }
             }
         },
@@ -1003,6 +1058,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.createSecretForm": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                },
+                "secret_name": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
