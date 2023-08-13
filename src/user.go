@@ -174,9 +174,9 @@ func GetUserCreds(operator string, account string, user string) ([]byte, error) 
 }
 
 //	@Tags		User
-//	@Router		/creds/operator/{operator}/account/{account}/user/{name} [get]
+//	@Router		/creds/operator/{operator}/account/{account}/user/{user} [get]
 //	@Summary	Generate user credentials
-//	@Param		name		path	string	true	"Username"
+//	@Param		user		path	string	true	"Username"
 //	@Param		account		path	string	true	"Account name"
 //	@Param		operator	path	string	true	"Operator name"
 //	@Description
