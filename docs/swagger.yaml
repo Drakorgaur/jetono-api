@@ -161,6 +161,13 @@ definitions:
       name:
         type: string
     type: object
+  src.storeConfigForm:
+    properties:
+      name:
+        type: string
+      operator:
+        type: string
+    type: object
   src.updateAccountForm:
     properties:
       conns:
@@ -385,6 +392,47 @@ paths:
       summary: Generate user credentials
       tags:
       - User
+  /generate/config:
+    get:
+      parameters:
+      - description: Operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      responses:
+        "200":
+          description: text/plain config file
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Sends configuration for nats server with resolver as this operator
+      tags:
+      - Generate
+    post:
+      parameters:
+      - description: json body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.storeConfigForm'
+      responses:
+        "200":
+          description: 200 ok
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Stores configuration for nats server with resolver as this operator
+        in kubernetes secret
+      tags:
+      - Generate
   /operator:
     post:
       description: Add an operator to the store

@@ -138,6 +138,68 @@
                 }
             }
         },
+        "/generate/config": {
+            "get": {
+                "tags": [
+                    "Generate"
+                ],
+                "summary": "Sends configuration for nats server with resolver as this operator",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "text/plain config file",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Generate"
+                ],
+                "summary": "Stores configuration for nats server with resolver as this operator in kubernetes secret",
+                "parameters": [
+                    {
+                        "description": "json body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.storeConfigForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 ok",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/operator": {
             "post": {
                 "description": "Add an operator to the store",
@@ -929,6 +991,17 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.storeConfigForm": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
                     "type": "string"
                 }
             }
