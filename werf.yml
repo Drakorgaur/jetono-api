@@ -1,0 +1,11 @@
+project: jetono-api
+configVersion: 1
+deploy:
+  namespace: "default"
+  helmRelease: "jetono-api"
+
+---
+image: "jetono-api"
+context: .
+dockerfile: docker/Dockerfile
+target: builder
