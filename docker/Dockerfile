@@ -5,7 +5,7 @@ ENV CGO_ENABLED=1
 
 WORKDIR /jetono-api/src
 
-COPY .. .
+COPY . .
 RUN mkdir -p /jetono-api/bin
 RUN curl -s https://raw.githubusercontent.com/objectbox/objectbox-go/main/install.sh -o install.sh
 RUN bash install.sh
