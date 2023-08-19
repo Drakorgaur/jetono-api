@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations: {{- toYaml .Values.volumes.annotations | nindent 4 }}
+  labels: {{- toYaml .Values.volumes.labels | nindent 4 }}
+  name: {{ .Values.volumes.name }}
+spec:
+  accessModes: {{- toYaml .Values.volumes.accessModes | nindent 4 }}
+  capacity:
+    storage: {{ .Values.volumes.size | quote }}
+    hostPath: {{ .Values.volumes.hostPath }}
+    persistentVolumeReclaimPolicy: {{ .Values.volumes.persistentVolumeReclaimPolicy }}

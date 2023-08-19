@@ -96,3 +96,14 @@ env:
     value: kubernetes # objectbox or kubernetes
   - name: OBJECTBOX_VOL
     value: /mnt/objectbox
+
+volume: true
+volumes:
+  name: nsc
+  annotations: {}
+  accessModes:
+    - ReadWriteOnce
+  labels: {}
+  hostPath: /nsc
+  size: 1Gi
+  persistentVolumeReclaimPolicy: Retain
