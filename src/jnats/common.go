@@ -1,6 +1,7 @@
 package jnats
 
 import (
+	"fmt"
 	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/nats-io/nats.go"
 	nsc "github.com/nats-io/nsc/cmd"
@@ -10,20 +11,19 @@ import (
 type UserNatsConn struct {
 	*storage.AccountServerMap
 	*nats.Conn
-	Name  string
+	User  string
 	creds []byte
 }
 
-func (u *UserNatsConn) SetCreds(creds []byte) {
-	u.creds = creds
-}
-
 func (u *UserNatsConn) UserCredentials() nats.Option {
+	fmt.Println(u.Operator)
 	s, err := nsc.GetStoreForOperator(u.Operator)
 	if err != nil {
 		return nil
 	}
-	return nats.UserCredentials(s.Resolve(store.Accounts, u.Account, store.Users, u.Name+".jwt"))
+	resolve := s.Resolve(store.Accounts, u.Account, store.Users, u.User+".jwt")
+	fmt.Printf("resolve %s\n", resolve)
+	return nats.UserCredentials(resolve)
 }
 
 func (u *UserNatsConn) GetNats(options ...nats.Option) (*nats.Conn, error) {

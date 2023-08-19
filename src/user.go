@@ -293,9 +293,9 @@ var response []*nats.StreamInfo
 
 type getStreamsForm struct {
 	ServersList []string `json:"servers_list,omitempty" query:"servers_list"`
-	Operator    string   `json:"operator" path:"operator"`
-	Account     string   `json:"account" path:"account"`
-	User        string   `json:"user" path:"user"`
+	Operator    string   `json:"operator" param:"operator"`
+	Account     string   `json:"account" param:"account"`
+	User        string   `json:"user" param:"name"`
 }
 
 func getUserStreams(c echo.Context) error {
@@ -319,9 +319,9 @@ func getUserStreams(c echo.Context) error {
 
 	u := lib.UserNatsConn{
 		AccountServerMap: &accCtx,
+		User:             form.User,
 	}
-	creds, _ := GetUserCreds(form.Operator, form.Account, form.User)
-	u.SetCreds(creds)
+
 	streams, err := u.GetStreams()
 	if err != nil {
 		return badRequest(c, err)
