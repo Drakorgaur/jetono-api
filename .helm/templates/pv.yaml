@@ -7,6 +7,7 @@ metadata:
 spec:
   accessModes: {{- toYaml .Values.volumes.accessModes | nindent 4 }}
   capacity:
-    storage: {{ .Values.volumes.size | quote }}
-    hostPath: {{ .Values.volumes.hostPath }}
-    persistentVolumeReclaimPolicy: {{ .Values.volumes.persistentVolumeReclaimPolicy }}
+    storage: {{ .Values.volumes.size }}
+  hostPath:
+      path: {{ .Values.volumes.hostPath }}
+  persistentVolumeReclaimPolicy: {{ .Values.volumes.persistentVolumeReclaimPolicy }}
