@@ -241,21 +241,16 @@ func bindAccountCtx(c echo.Context) error {
 }
 
 type postPushForm struct {
-	Account     string   `json:"account,omitempty"`
-	Operator    string   `json:"operator,omitempty"`
-	ServersList []string `json:"server_list,omitempty"`
+	Account             string   `json:"account,omitempty" form:"account"`
+	Operator            string   `json:"operator,omitempty" form:"operator"`
+	AccountJwtServerUrl []string `json:"server_list,omitempty" form:"server_list"`
 }
 
 func pushAccount(c echo.Context) error {
 	var pushCmd = lookupCommand(nsc.GetRootCmd(), "pushAccount")
 
-	err := setFlagsIfInJson(pushCmd, &postPushForm{}, c)
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	form := &postPushForm{}
-	err = c.Bind(form)
+	form := new(postPushForm)
+	err := setFlagsIfInJson(pushCmd, form, c)
 	if err != nil {
 		return badRequest(c, err)
 	}
@@ -263,7 +258,7 @@ func pushAccount(c echo.Context) error {
 	accCtx := storage.AccountServerMap{
 		Operator:    form.Operator,
 		Account:     form.Account,
-		ServersList: strings.Join(form.ServersList, ","),
+		ServersList: strings.Join(form.AccountJwtServerUrl, ","),
 	}
 
 	if accCtx.ServersList == "" {
