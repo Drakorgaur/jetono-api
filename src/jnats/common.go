@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/nats-io/nats.go"
-	nsc "github.com/nats-io/nsc/cmd"
-	"github.com/nats-io/nsc/cmd/store"
+	"os"
+	"path/filepath"
 )
 
 type UserNatsConn struct {
@@ -17,11 +17,7 @@ type UserNatsConn struct {
 
 func (u *UserNatsConn) UserCredentials() nats.Option {
 	fmt.Println(u.Operator)
-	s, err := nsc.GetStoreForOperator(u.Operator)
-	if err != nil {
-		return nil
-	}
-	resolve := s.Resolve(store.Accounts, u.Account, store.Users, u.User+".jwt")
+	resolve := filepath.Join(os.Getenv("NKEYS_PATH"), "creds", u.Operator, u.Account, u.User+".creds")
 	fmt.Printf("resolve %s\n", resolve)
 	return nats.UserCredentials(resolve)
 }
