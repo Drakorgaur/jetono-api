@@ -97,7 +97,8 @@ env:
   - name: OBJECTBOX_VOL
     value: /mnt/objectbox
 
-volume: true
+volume:
+  enabled: true
 volumes:
   name: nsc
   annotations: {}
@@ -107,3 +108,7 @@ volumes:
   hostPath: /nsc
   size: 1Gi
   persistentVolumeReclaimPolicy: Retain
+
+volumeMounts:
+  name: nsc
+  mountPath: /nsc

@@ -48,6 +48,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env: {{- toYaml .Values.env | nindent 12 }}
+        {{- if .Values.volume.enabled }}
+          volumeMounts:
+            - mountPath: {{ .Values.volumeMounts.mountPath }}
+              name: {{ .Values.volumeMounts.name }}
+        {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -60,4 +66,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+      {{- if .Values.volume.enabled }}
+      volumes:
+        - name: {{ .Values.volumeMounts.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumes.name }}
+      {{- end }}
