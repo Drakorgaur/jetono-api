@@ -3,7 +3,7 @@ package src
 import (
 	"encoding/json"
 	"fmt"
-	lib "github.com/Drakorgaur/jetono-api/src/nats"
+	lib "github.com/Drakorgaur/jetono-api/src/jnats"
 	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/nats-io/jwt/v2"
@@ -11,25 +11,25 @@ import (
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 func init() {
-	module := "user"
-	initInfo(module)
+	root := GetEchoRoot()
 
-	GetEchoRoot().POST("operator/:operator/account/:account/"+module, addUser)
+	root.POST("operator/:operator/account/:account/user", addUser)
 
-	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"s", listUsers)
+	root.GET("operator/:operator/account/:account/users", listUsers)
 
-	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"/:name", describeUser)
+	root.GET("operator/:operator/account/:account/user/:name", describeUser)
 
-	GetEchoRoot().GET("creds/operator/:operator/account/:account/"+module+"/:name", generateUser)
+	root.GET("creds/operator/:operator/account/:account/user/:name", generateUser)
 
-	GetEchoRoot().DELETE("operator/:operator/account/:account/"+module+"/:name", revokeUser)
+	root.DELETE("operator/:operator/account/:account/user/:name", revokeUser)
 
-	GetEchoRoot().PATCH("operator/:operator/account/:account/"+module+"/:name", updateUser)
+	root.PATCH("operator/:operator/account/:account/user/:name", updateUser)
 
-	GetEchoRoot().GET("streams", getUserStreams)
+	root.GET("operator/:operator/account/:account/user/:name/streams", getUserStreams)
 }
 
 type addUserForm struct {
@@ -291,14 +291,23 @@ func updateUser(c echo.Context) error {
 
 var response []*nats.StreamInfo
 
+type getStreamsForm struct {
+	ServersList []string `json:"servers_list,omitempty" query:"servers_list"`
+	Operator    string   `json:"operator" path:"operator"`
+	Account     string   `json:"account" path:"account"`
+	User        string   `json:"user" path:"user"`
+}
+
 func getUserStreams(c echo.Context) error {
-	if err, _ := raiseForRequiredFlags(c.Param, "operator", "account", "user"); err != nil {
+	form := new(getStreamsForm)
+	if err := c.Bind(form); err != nil {
 		return badRequest(c, err)
 	}
+
 	accCtx := storage.AccountServerMap{
-		Operator:    c.QueryParam("operator"),
-		Account:     c.QueryParam("account"),
-		ServersList: c.QueryParam("servers"),
+		Operator:    form.Operator,
+		Account:     form.Account,
+		ServersList: strings.Join(form.ServersList, ","),
 	}
 
 	if accCtx.ServersList == "" {
@@ -311,7 +320,7 @@ func getUserStreams(c echo.Context) error {
 	u := lib.UserNatsConn{
 		AccountServerMap: &accCtx,
 	}
-	creds, _ := GetUserCreds(u.Operator, u.Account, c.Param("user"))
+	creds, _ := GetUserCreds(form.Operator, form.Account, form.User)
 	u.SetCreds(creds)
 	streams, err := u.GetStreams()
 	if err != nil {
