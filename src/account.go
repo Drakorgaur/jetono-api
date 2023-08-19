@@ -247,10 +247,10 @@ type postPushForm struct {
 }
 
 func pushAccount(c echo.Context) error {
-	var pushCmd = lookupCommand(nsc.GetRootCmd(), "pushAccount")
+	var pushCmd = lookupCommand(nsc.GetRootCmd(), "push")
 
-	form := new(postPushForm)
-	err := setFlagsIfInJson(pushCmd, form, c)
+	form := postPushForm{}
+	err := setFlagsIfInJson(pushCmd, &form, c)
 	if err != nil {
 		return badRequest(c, err)
 	}
