@@ -4,23 +4,24 @@ import (
 	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
+	"strings"
 )
 
 func init() {
-	module := "account"
-	initInfo(module)
+	root := GetEchoRoot()
+	root.POST("operator/:operator/account", addAccount)
 
-	GetEchoRoot().POST("operator/:operator/"+module, addAccount)
+	root.GET("operator/:operator/accounts", listAccounts)
 
-	GetEchoRoot().GET("operator/:operator/"+module+"s", listAccounts)
+	root.GET("operator/:operator/account/:name", describeAccount)
 
-	GetEchoRoot().GET("operator/:operator/"+module+"/:name", describeAccount)
+	root.PATCH("operator/:operator/account/:name", updateAccount)
 
-	GetEchoRoot().PATCH("operator/:operator/"+module+"/:name", updateAccount)
+	root.GET("bind", readBindAccountCtx)
 
-	GetEchoRoot().GET("bind", readBindAccountCtx)
+	root.POST("bind", bindAccountCtx)
 
-	GetEchoRoot().POST("bind", bindAccountCtx)
+	root.POST("pushAccount", pushAccount)
 }
 
 type addAccountForm struct {
@@ -236,5 +237,54 @@ func bindAccountCtx(c echo.Context) error {
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
 		Message: "Account bound",
+	})
+}
+
+type postPushForm struct {
+	Account     string   `json:"account,omitempty"`
+	Operator    string   `json:"operator,omitempty"`
+	ServersList []string `json:"server_list,omitempty"`
+}
+
+func pushAccount(c echo.Context) error {
+	var pushCmd = lookupCommand(nsc.GetRootCmd(), "pushAccount")
+
+	err := setFlagsIfInJson(pushCmd, &postPushForm{}, c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	form := &postPushForm{}
+	err = c.Bind(form)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	accCtx := storage.AccountServerMap{
+		Operator:    form.Operator,
+		Account:     form.Account,
+		ServersList: strings.Join(form.ServersList, ","),
+	}
+
+	if accCtx.ServersList == "" {
+		err := storage.FillAccCtxFromStorage(&accCtx)
+		if err != nil {
+			return badRequest(c, err)
+		}
+	}
+
+	err = pushCmd.Flags().Set("account-jwt-server-url", accCtx.ServersList)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	err = pushCmd.RunE(pushCmd, []string{form.Account})
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, &SimpleJSONResponse{
+		Status:  "200",
+		Message: "Account pushed",
 	})
 }
