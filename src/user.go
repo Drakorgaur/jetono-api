@@ -1,7 +1,6 @@
 package src
 
 import (
-	"encoding/json"
 	"fmt"
 	lib "github.com/Drakorgaur/jetono-api/src/jnats"
 	"github.com/Drakorgaur/jetono-api/src/storage"
@@ -29,7 +28,9 @@ func init() {
 
 	root.PATCH("operator/:operator/account/:account/user/:name", updateUser)
 
-	root.GET("operator/:operator/account/:account/user/:name/streams", getUserStreams)
+	root.GET("nats/streams", getUserStreams)
+
+	root.GET("nats/consumers", getUserConsumers)
 }
 
 type addUserForm struct {
@@ -289,19 +290,18 @@ func updateUser(c echo.Context) error {
 	})
 }
 
-var response []*nats.StreamInfo
-
-type getStreamsForm struct {
+type getNATSResourceForm struct {
 	ServersList []string `json:"servers_list,omitempty" query:"servers_list"`
 	Operator    string   `json:"operator" param:"operator"`
 	Account     string   `json:"account" param:"account"`
 	User        string   `json:"user" param:"name"`
+	StreamName  string   `json:"stream_name,omitempty" param:"stream_name"`
 }
 
-func getUserStreams(c echo.Context) error {
-	form := new(getStreamsForm)
+func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, error) {
+	form := new(getNATSResourceForm)
 	if err := c.Bind(form); err != nil {
-		return badRequest(c, err)
+		return nil, form, err
 	}
 
 	accCtx := storage.AccountServerMap{
@@ -313,13 +313,32 @@ func getUserStreams(c echo.Context) error {
 	if accCtx.ServersList == "" {
 		err := storage.FillAccCtxFromStorage(&accCtx)
 		if err != nil {
-			return badRequest(c, err)
+			return nil, form, err
 		}
 	}
 
-	u := lib.UserNatsConn{
+	u := &lib.UserNatsConn{
 		AccountServerMap: &accCtx,
 		User:             form.User,
+	}
+	return u, form, nil
+}
+
+type streamsInfoResponse struct {
+	Streams []*nats.StreamInfo `json:"streams"`
+	Code    string             `json:"code"`
+}
+
+//	@Tags			NATS
+//	@Router			/nats/streams [get]
+//	@Param			json		body	getNATSResourceForm	true	"info about resources"
+//	@Summary		Gets streams for user
+//	@Success		200	{object}	streamsInfoResponse	"Status ok"
+//	@Failure		500	{object}	string				"Internal error"
+func getUserStreams(c echo.Context) error {
+	u, _, err := initUserNatsConn(c)
+	if err != nil {
+		return badRequest(c, err)
 	}
 
 	streams, err := u.GetStreams()
@@ -327,17 +346,50 @@ func getUserStreams(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
+	var response []*nats.StreamInfo
 	for stream := range streams {
 		response = append(response, stream)
 	}
 
-	marshal, err := json.Marshal(response)
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	return c.JSON(200, map[string]string{
+	return c.JSON(200, map[string]any{
 		"code":    "200",
-		"streams": string(marshal),
+		"streams": response,
+	})
+}
+
+type consumersInfoResponse struct {
+	Consumers []*nats.ConsumerInfo `json:"consumers"`
+	Code      string               `json:"code"`
+}
+
+//	@Tags			NATS
+//	@Router			/nats/consumers [get]
+//	@Param			json		body	getNATSResourceForm	true	"info about resources"
+//	@Summary		Gets consumers for user
+//	@Success		200	{object}	consumersInfoResponse	"Status ok"
+//	@Failure		500	{object}	string				"Internal error"
+func getUserConsumers(c echo.Context) error {
+	u, form, err := initUserNatsConn(c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	consumers, err := u.GetConsumers(form.StreamName)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	var response []*nats.ConsumerInfo
+	for consumer := range consumers {
+		response = append(response, consumer)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":      "200",
+		"consumers": response,
 	})
 }

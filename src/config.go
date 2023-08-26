@@ -6,7 +6,9 @@ import (
 	"os"
 )
 
-func checkForEnv(env string, dirName string) error {
+var nkeys = "NKEYS_PATH"
+
+func checkForEnv(env string, dirName string) error { // TODO: rename
 	dir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("failed to configure application. Can not get pwd")
@@ -28,7 +30,7 @@ func setUp() error {
 		return err
 	}
 
-	if err := checkForEnv("NKEYS_PATH", "keys"); err != nil {
+	if err := checkForEnv(nkeys, "keys"); err != nil {
 		return err
 	}
 
