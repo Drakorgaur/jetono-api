@@ -10,7 +10,6 @@ import (
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func init() {
@@ -291,11 +290,11 @@ func updateUser(c echo.Context) error {
 }
 
 type getNATSResourceForm struct {
-	ServersList []string `json:"servers_list,omitempty" query:"servers_list" `
-	Operator    string   `json:"operator" param:"operator" query:"operator"`
-	Account     string   `json:"account" param:"account" query:"account"`
-	User        string   `json:"user" param:"name" query:"name"`
-	StreamName  string   `json:"stream_name,omitempty" query:"stream_name"`
+	ServerUrl  string `json:"server_url,omitempty" query:"server_url" `
+	Operator   string `json:"operator" param:"operator" query:"operator"`
+	Account    string `json:"account" param:"account" query:"account"`
+	User       string `json:"user" param:"name" query:"user"`
+	StreamName string `json:"stream_name,omitempty" query:"stream_name"`
 }
 
 func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, error) {
@@ -305,12 +304,12 @@ func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, 
 	}
 
 	accCtx := storage.AccountServerMap{
-		Operator:    form.Operator,
-		Account:     form.Account,
-		ServersList: strings.Join(form.ServersList, ","),
+		Operator: form.Operator,
+		Account:  form.Account,
+		Server:   form.ServerUrl,
 	}
 
-	if accCtx.ServersList == "" {
+	if accCtx.Server == "" {
 		err := storage.FillAccCtxFromStorage(&accCtx)
 		if err != nil {
 			return nil, form, err
@@ -326,10 +325,10 @@ func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, 
 
 //	@Tags		NATS
 //	@Router		/nats/streams [get]
-//	@Param		operator		query	string	true	"operator name"
-//	@Param		account			query	string	true	"account name"
-//	@Param		user			query	string	true	"username"
-//	@Param		servers_list	query	string	false	"servers list"
+//	@Param		operator	query	string	true	"operator name"
+//	@Param		account		query	string	true	"account name"
+//	@Param		user		query	string	true	"username"
+//	@Param		server_url	query	string	false	"server url"
 //	@Summary	Gets streams for user
 //	@Failure	500	{object}	string	"Internal error"
 func getUserStreams(c echo.Context) error {
@@ -360,11 +359,11 @@ func getUserStreams(c echo.Context) error {
 
 //	@Tags		NATS
 //	@Router		/nats/consumers [get]
-//	@Param		operator		query	string	true	"operator name"
-//	@Param		account			query	string	true	"account name"
-//	@Param		user			query	string	true	"username"
-//	@Param		servers_list	query	string	false	"servers list"
-//	@Param		stream_name		query	string	false	"stream name"
+//	@Param		operator	query	string	true	"operator name"
+//	@Param		account		query	string	true	"account name"
+//	@Param		user		query	string	true	"username"
+//	@Param		server_url	query	string	false	"server url"
+//	@Param		stream_name	query	string	false	"stream name"
 //	@Summary	Gets consumers for user
 //	@Failure	500	{object}	string	"Internal error"
 func getUserConsumers(c echo.Context) error {

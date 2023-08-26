@@ -4,7 +4,6 @@ import (
 	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
-	"strings"
 )
 
 func init() {
@@ -241,11 +240,18 @@ func bindAccountCtx(c echo.Context) error {
 }
 
 type postPushForm struct {
-	Account             string   `json:"account,omitempty" form:"account"`
-	Operator            string   `json:"operator,omitempty" form:"operator"`
-	AccountJwtServerUrl []string `json:"server_list,omitempty" form:"server_list"`
+	Account             string `json:"account,omitempty" form:"account"`
+	Operator            string `json:"operator,omitempty" form:"operator"`
+	AccountJwtServerUrl string `json:"server_list,omitempty" form:"server_url"`
 }
 
+//	@Tags			Account
+//	@Router			/pushAccount [post]
+//	@Param			json	body	postPushForm	true	"json"
+//	@Summary		Push account to server
+//	@Description	Returns json with confirmation
+//	@Success		200	{object}	map[string]string	"Acknowledgement"
+//	@Failure		500	{object}	string				"Internal error"
 func pushAccount(c echo.Context) error {
 	var pushCmd = lookupCommand(nsc.GetRootCmd(), "push")
 
@@ -256,19 +262,19 @@ func pushAccount(c echo.Context) error {
 	}
 
 	accCtx := storage.AccountServerMap{
-		Operator:    form.Operator,
-		Account:     form.Account,
-		ServersList: strings.Join(form.AccountJwtServerUrl, ","),
+		Operator: form.Operator,
+		Account:  form.Account,
+		Server:   form.AccountJwtServerUrl,
 	}
 
-	if accCtx.ServersList == "" {
+	if accCtx.Server == "" {
 		err := storage.FillAccCtxFromStorage(&accCtx)
 		if err != nil {
 			return badRequest(c, err)
 		}
 	}
 
-	err = pushCmd.Flags().Set("account-jwt-server-url", accCtx.ServersList)
+	err = pushCmd.Flags().Set("account-jwt-server-url", accCtx.Server)
 	if err != nil {
 		return badRequest(c, err)
 	}

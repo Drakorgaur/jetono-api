@@ -24,5 +24,5 @@ func (u *UserNatsConn) UserCredentials() nats.Option {
 
 func (u *UserNatsConn) GetNats(options ...nats.Option) (*nats.Conn, error) {
 	options = append(options, u.UserCredentials())
-	return nats.Connect(u.ServersList, options...)
+	return nats.Connect(u.Server, options...)
 }

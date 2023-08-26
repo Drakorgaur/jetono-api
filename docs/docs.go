@@ -242,8 +242,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "servers list",
-                        "name": "servers_list",
+                        "description": "server url",
+                        "name": "server_url",
                         "in": "query"
                     },
                     {
@@ -293,8 +293,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "servers list",
-                        "name": "servers_list",
+                        "description": "server url",
+                        "name": "server_url",
                         "in": "query"
                     }
                 ],
@@ -1384,7 +1384,7 @@ const docTemplate = `{
                 "operator": {
                     "type": "string"
                 },
-                "servers": {
+                "server": {
                     "type": "string"
                 }
             }

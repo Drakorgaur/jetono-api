@@ -324,7 +324,7 @@ definitions:
         type: string
       operator:
         type: string
-      servers:
+      server:
         type: string
     type: object
 info:
@@ -478,9 +478,9 @@ paths:
         name: user
         required: true
         type: string
-      - description: servers list
+      - description: server url
         in: query
-        name: servers_list
+        name: server_url
         type: string
       - description: stream name
         in: query
@@ -512,9 +512,9 @@ paths:
         name: user
         required: true
         type: string
-      - description: servers list
+      - description: server url
         in: query
-        name: servers_list
+        name: server_url
         type: string
       responses:
         "500":
