@@ -212,6 +212,156 @@ const docTemplate = `{
                 }
             }
         },
+        "/nats/consumer": {
+            "post": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Gets consumers for user",
+                "parameters": [
+                    {
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addNatsConsumerForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/nats/consumers": {
+            "get": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Gets consumers for user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "account name",
+                        "name": "account",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "server url",
+                        "name": "server_url",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "stream name",
+                        "name": "stream_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/nats/stream": {
+            "post": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Add stream for user",
+                "parameters": [
+                    {
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addNatsStreamForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/nats/streams": {
+            "get": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Gets streams for user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "account name",
+                        "name": "account",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "server url",
+                        "name": "server_url",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/operator": {
             "post": {
                 "description": "Add an operator to the store",
@@ -758,6 +908,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/pushAccount": {
+            "post": {
+                "description": "Returns json with confirmation",
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Push account to server",
+                "parameters": [
+                    {
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.postPushForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Acknowledgement",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/secret": {
             "post": {
                 "tags": [
@@ -793,6 +980,321 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "nats.AckPolicy": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "AckNonePolicy",
+                "AckAllPolicy",
+                "AckExplicitPolicy"
+            ]
+        },
+        "nats.ConsumerConfig": {
+            "type": "object",
+            "properties": {
+                "ack_policy": {
+                    "$ref": "#/definitions/nats.AckPolicy"
+                },
+                "ack_wait": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "backoff": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/time.Duration"
+                    }
+                },
+                "deliver_group": {
+                    "type": "string"
+                },
+                "deliver_policy": {
+                    "$ref": "#/definitions/nats.DeliverPolicy"
+                },
+                "deliver_subject": {
+                    "description": "Push based consumers.",
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "durable_name": {
+                    "type": "string"
+                },
+                "filter_subject": {
+                    "type": "string"
+                },
+                "flow_control": {
+                    "type": "boolean"
+                },
+                "headers_only": {
+                    "type": "boolean"
+                },
+                "idle_heartbeat": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "inactive_threshold": {
+                    "description": "Ephemeral inactivity threshold.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ]
+                },
+                "max_ack_pending": {
+                    "type": "integer"
+                },
+                "max_batch": {
+                    "description": "Pull based options.",
+                    "type": "integer"
+                },
+                "max_deliver": {
+                    "type": "integer"
+                },
+                "max_expires": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "max_waiting": {
+                    "type": "integer"
+                },
+                "mem_storage": {
+                    "description": "Force memory storage.",
+                    "type": "boolean"
+                },
+                "num_replicas": {
+                    "description": "Generally inherited by parent stream and other markers, now can be configured directly.",
+                    "type": "integer"
+                },
+                "opt_start_seq": {
+                    "type": "integer"
+                },
+                "opt_start_time": {
+                    "type": "string"
+                },
+                "rate_limit_bps": {
+                    "description": "Bits per sec",
+                    "type": "integer"
+                },
+                "replay_policy": {
+                    "$ref": "#/definitions/nats.ReplayPolicy"
+                },
+                "sample_freq": {
+                    "type": "string"
+                }
+            }
+        },
+        "nats.DeliverPolicy": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "x-enum-varnames": [
+                "DeliverAllPolicy",
+                "DeliverLastPolicy",
+                "DeliverNewPolicy",
+                "DeliverByStartSequencePolicy",
+                "DeliverByStartTimePolicy",
+                "DeliverLastPerSubjectPolicy"
+            ]
+        },
+        "nats.DiscardPolicy": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "x-enum-varnames": [
+                "DiscardOld",
+                "DiscardNew"
+            ]
+        },
+        "nats.ExternalStream": {
+            "type": "object",
+            "properties": {
+                "api": {
+                    "type": "string"
+                },
+                "deliver": {
+                    "type": "string"
+                }
+            }
+        },
+        "nats.Placement": {
+            "type": "object",
+            "properties": {
+                "cluster": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "nats.ReplayPolicy": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "x-enum-varnames": [
+                "ReplayInstantPolicy",
+                "ReplayOriginalPolicy"
+            ]
+        },
+        "nats.RetentionPolicy": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "LimitsPolicy",
+                "InterestPolicy",
+                "WorkQueuePolicy"
+            ]
+        },
+        "nats.StorageType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "x-enum-varnames": [
+                "FileStorage",
+                "MemoryStorage"
+            ]
+        },
+        "nats.StreamConfig": {
+            "type": "object",
+            "properties": {
+                "allow_rollup_hdrs": {
+                    "type": "boolean"
+                },
+                "deny_delete": {
+                    "type": "boolean"
+                },
+                "deny_purge": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discard": {
+                    "$ref": "#/definitions/nats.DiscardPolicy"
+                },
+                "duplicate_window": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "max_age": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "max_bytes": {
+                    "type": "integer"
+                },
+                "max_consumers": {
+                    "type": "integer"
+                },
+                "max_msg_size": {
+                    "type": "integer"
+                },
+                "max_msgs": {
+                    "type": "integer"
+                },
+                "max_msgs_per_subject": {
+                    "type": "integer"
+                },
+                "mirror": {
+                    "$ref": "#/definitions/nats.StreamSource"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "no_ack": {
+                    "type": "boolean"
+                },
+                "num_replicas": {
+                    "type": "integer"
+                },
+                "placement": {
+                    "$ref": "#/definitions/nats.Placement"
+                },
+                "republish": {
+                    "description": "Allow republish of the message after being sequenced and stored.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/nats.SubjectMapping"
+                        }
+                    ]
+                },
+                "retention": {
+                    "$ref": "#/definitions/nats.RetentionPolicy"
+                },
+                "sealed": {
+                    "type": "boolean"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/nats.StreamSource"
+                    }
+                },
+                "storage": {
+                    "$ref": "#/definitions/nats.StorageType"
+                },
+                "subjects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "template_owner": {
+                    "type": "string"
+                }
+            }
+        },
+        "nats.StreamSource": {
+            "type": "object",
+            "properties": {
+                "external": {
+                    "$ref": "#/definitions/nats.ExternalStream"
+                },
+                "filter_subject": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "opt_start_seq": {
+                    "type": "integer"
+                },
+                "opt_start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "nats.SubjectMapping": {
+            "type": "object",
+            "properties": {
+                "dest": {
+                    "type": "string"
+                },
+                "src": {
+                    "type": "string"
+                }
+            }
+        },
         "src.AccountDescription": {
             "type": "object",
             "properties": {
@@ -868,6 +1370,26 @@ const docTemplate = `{
                     }
                 },
                 "sub": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.NATSResourceForm": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                },
+                "server_url": {
+                    "type": "string"
+                },
+                "stream_name": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
@@ -1025,6 +1547,28 @@ const docTemplate = `{
                 }
             }
         },
+        "src.addNatsConsumerForm": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/nats.ConsumerConfig"
+                },
+                "meta": {
+                    "$ref": "#/definitions/src.NATSResourceForm"
+                }
+            }
+        },
+        "src.addNatsStreamForm": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/nats.StreamConfig"
+                },
+                "meta": {
+                    "$ref": "#/definitions/src.NATSResourceForm"
+                }
+            }
+        },
         "src.addOperatorForm": {
             "type": "object",
             "required": [
@@ -1078,6 +1622,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.postPushForm": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                },
+                "server_list": {
                     "type": "string"
                 }
             }
@@ -1288,10 +1846,33 @@ const docTemplate = `{
                 "operator": {
                     "type": "string"
                 },
-                "servers": {
+                "server": {
                     "type": "string"
                 }
             }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
+            ]
         }
     }
 }`

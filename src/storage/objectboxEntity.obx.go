@@ -84,7 +84,7 @@ func (accountServerMapB_EntityInfo) PutRelated(ob *objectbox.ObjectBox, object i
 // Flatten is called by ObjectBox to transform an object to a FlatBuffer
 func (accountServerMapB_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, id uint64) error {
 	obj := object.(*AccountServerMapB)
-	var offsetAccountServerMap_Servers = fbutils.CreateStringOffset(fbb, obj.AccountServerMap.ServersList)
+	var offsetAccountServerMap_Servers = fbutils.CreateStringOffset(fbb, obj.AccountServerMap.Server)
 	var offsetUid = fbutils.CreateStringOffset(fbb, obj.Uid)
 
 	// build the FlatBuffers object
@@ -110,7 +110,7 @@ func (accountServerMapB_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 
 	return &AccountServerMapB{
 		AccountServerMap: AccountServerMap{
-			ServersList: fbutils.GetStringSlot(table, 4),
+			Server: fbutils.GetStringSlot(table, 4),
 		},
 		Id:  propId,
 		Uid: fbutils.GetStringSlot(table, 8),

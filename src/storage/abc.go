@@ -11,9 +11,9 @@ type Storage interface {
 }
 
 type AccountServerMap struct {
-	Operator    string `objectbox:"-" json:"operator"`
-	Account     string `objectbox:"-" json:"account"`
-	ServersList string `json:"servers"`
+	Operator string `objectbox:"-" json:"operator"`
+	Account  string `objectbox:"-" json:"account"`
+	Server   string `json:"server"`
 }
 
 func StoreType() (Storage, error) {

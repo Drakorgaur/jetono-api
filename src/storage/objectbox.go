@@ -87,7 +87,7 @@ func (s *ObjectBoxStore) ReadCtx(asm *AccountServerMap) error {
 		return err
 	}
 
-	asm.ServersList = asmb.ServersList
+	asm.Server = asmb.Server
 
 	return nil
 }

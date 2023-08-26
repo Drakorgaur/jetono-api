@@ -1,9 +1,8 @@
 package src
 
 import (
-	"encoding/json"
 	"fmt"
-	lib "github.com/Drakorgaur/jetono-api/src/nats"
+	lib "github.com/Drakorgaur/jetono-api/src/jnats"
 	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/nats-io/jwt/v2"
@@ -14,22 +13,27 @@ import (
 )
 
 func init() {
-	module := "user"
-	initInfo(module)
+	root := GetEchoRoot()
 
-	GetEchoRoot().POST("operator/:operator/account/:account/"+module, addUser)
+	root.POST("operator/:operator/account/:account/user", addUser)
 
-	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"s", listUsers)
+	root.GET("operator/:operator/account/:account/users", listUsers)
 
-	GetEchoRoot().GET("operator/:operator/account/:account/"+module+"/:name", describeUser)
+	root.GET("operator/:operator/account/:account/user/:name", describeUser)
 
-	GetEchoRoot().GET("creds/operator/:operator/account/:account/"+module+"/:name", generateUser)
+	root.GET("creds/operator/:operator/account/:account/user/:name", generateUser)
 
-	GetEchoRoot().DELETE("operator/:operator/account/:account/"+module+"/:name", revokeUser)
+	root.DELETE("operator/:operator/account/:account/user/:name", revokeUser)
 
-	GetEchoRoot().PATCH("operator/:operator/account/:account/"+module+"/:name", updateUser)
+	root.PATCH("operator/:operator/account/:account/user/:name", updateUser)
 
-	GetEchoRoot().GET("streams", getUserStreams)
+	root.GET("nats/streams", getUserStreams)
+
+	root.GET("nats/consumers", getUserConsumers)
+
+	root.POST("nats/stream", addStream)
+
+	root.POST("nats/consumer", addConsumer)
 }
 
 type addUserForm struct {
@@ -289,46 +293,173 @@ func updateUser(c echo.Context) error {
 	})
 }
 
-var response []*nats.StreamInfo
+type NATSResourceForm struct {
+	ServerUrl  string `json:"server_url,omitempty" query:"server_url" `
+	Operator   string `json:"operator" param:"operator" query:"operator"`
+	Account    string `json:"account" param:"account" query:"account"`
+	User       string `json:"user" param:"name" query:"user"`
+	StreamName string `json:"stream_name,omitempty" query:"stream_name"`
+}
 
-func getUserStreams(c echo.Context) error {
-	if err, _ := raiseForRequiredFlags(c.Param, "operator", "account", "user"); err != nil {
-		return badRequest(c, err)
+func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *NATSResourceForm, error) {
+	form := new(NATSResourceForm)
+	if err := c.Bind(form); err != nil {
+		return nil, form, err
 	}
+
 	accCtx := storage.AccountServerMap{
-		Operator:    c.QueryParam("operator"),
-		Account:     c.QueryParam("account"),
-		ServersList: c.QueryParam("servers"),
+		Operator: form.Operator,
+		Account:  form.Account,
+		Server:   form.ServerUrl,
 	}
 
-	if accCtx.ServersList == "" {
+	if accCtx.Server == "" {
 		err := storage.FillAccCtxFromStorage(&accCtx)
 		if err != nil {
-			return badRequest(c, err)
+			return nil, form, err
 		}
 	}
 
-	u := lib.UserNatsConn{
+	u := &lib.UserNatsConn{
 		AccountServerMap: &accCtx,
+		User:             form.User,
 	}
-	creds, _ := GetUserCreds(u.Operator, u.Account, c.Param("user"))
-	u.SetCreds(creds)
+	return u, form, nil
+}
+
+//	@Tags		NATS
+//	@Router		/nats/streams [get]
+//	@Param		operator	query	string	true	"operator name"
+//	@Param		account		query	string	true	"account name"
+//	@Param		user		query	string	true	"username"
+//	@Param		server_url	query	string	false	"server url"
+//	@Summary	Gets streams for user
+//	@Failure	500	{object}	string	"Internal error"
+func getUserStreams(c echo.Context) error {
+	u, _, err := initUserNatsConn(c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
 	streams, err := u.GetStreams()
 	if err != nil {
 		return badRequest(c, err)
 	}
 
+	var response []*nats.StreamInfo
 	for stream := range streams {
 		response = append(response, stream)
 	}
 
-	marshal, err := json.Marshal(response)
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	return c.JSON(200, map[string]string{
+	return c.JSON(200, map[string]any{
 		"code":    "200",
-		"streams": string(marshal),
+		"streams": response,
+	})
+}
+
+//	@Tags		NATS
+//	@Router		/nats/consumers [get]
+//	@Param		operator	query	string	true	"operator name"
+//	@Param		account		query	string	true	"account name"
+//	@Param		user		query	string	true	"username"
+//	@Param		server_url	query	string	false	"server url"
+//	@Param		stream_name	query	string	false	"stream name"
+//	@Summary	Gets consumers for user
+//	@Failure	500	{object}	string	"Internal error"
+func getUserConsumers(c echo.Context) error {
+	u, form, err := initUserNatsConn(c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	consumers, err := u.GetConsumers(form.StreamName)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	var response []*nats.ConsumerInfo
+	for consumer := range consumers {
+		response = append(response, consumer)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":      "200",
+		"consumers": response,
+	})
+}
+
+type addNatsStreamForm struct {
+	Meta   *NATSResourceForm  `json:"meta"`
+	Config *nats.StreamConfig `json:"config"`
+}
+
+//	@Tags		NATS
+//	@Router		/nats/stream [post]
+//	@Param		json body	addNatsStreamForm	true	"json"
+//	@Summary	Add stream for user
+//	@Failure	500	{object}	string	"Internal error"
+func addStream(c echo.Context) error {
+	form := addNatsStreamForm{}
+	if err := c.Bind(&form); err != nil {
+		return badRequest(c, err)
+	}
+
+	u := &lib.UserNatsConn{
+		AccountServerMap: &storage.AccountServerMap{
+			Operator: form.Meta.Operator,
+			Account:  form.Meta.Account,
+			Server:   form.Meta.ServerUrl,
+		},
+		User: form.Meta.User,
+	}
+
+	stream, err := u.AddStream(form.Config)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":   "200",
+		"stream": stream,
+	})
+}
+
+type addNatsConsumerForm struct {
+	Meta   *NATSResourceForm    `json:"meta"`
+	Config *nats.ConsumerConfig `json:"config"`
+}
+
+//	@Tags		NATS
+//	@Router		/nats/consumer [post]
+//	@Param		json	body	addNatsConsumerForm	true	"json"
+//	@Summary	Gets consumers for user
+//	@Failure	500	{object}	string	"Internal error"
+func addConsumer(c echo.Context) error {
+	form := addNatsConsumerForm{}
+	if err := c.Bind(&form); err != nil {
+		return badRequest(c, err)
+	}
+
+	u := &lib.UserNatsConn{
+		AccountServerMap: &storage.AccountServerMap{
+			Operator: form.Meta.Operator,
+			Account:  form.Meta.Account,
+			Server:   form.Meta.ServerUrl,
+		},
+		User: form.Meta.User,
+	}
+
+	stream, err := u.AddConsumer(form.Meta.StreamName, form.Config)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":   "200",
+		"stream": stream,
 	})
 }

@@ -57,7 +57,7 @@ func (s *KubernetesStore) StoreCtx(usm *AccountServerMap) error {
 	return s.StoreCM(
 		GenerateCMName(usm.Operator, usm.Account),
 		map[string]string{
-			"servers": usm.ServersList,
+			"servers": usm.Server,
 		},
 		s.CtxNs,
 	)
@@ -110,7 +110,7 @@ func (s *KubernetesStore) ReadCtx(usm *AccountServerMap) error {
 		return err
 	}
 
-	usm.ServersList = cm.Data["servers"]
+	usm.Server = cm.Data["servers"]
 
 	return nil
 }

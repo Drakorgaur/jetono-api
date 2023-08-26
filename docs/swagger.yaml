@@ -1,4 +1,220 @@
 definitions:
+  nats.AckPolicy:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - AckNonePolicy
+    - AckAllPolicy
+    - AckExplicitPolicy
+  nats.ConsumerConfig:
+    properties:
+      ack_policy:
+        $ref: '#/definitions/nats.AckPolicy'
+      ack_wait:
+        $ref: '#/definitions/time.Duration'
+      backoff:
+        items:
+          $ref: '#/definitions/time.Duration'
+        type: array
+      deliver_group:
+        type: string
+      deliver_policy:
+        $ref: '#/definitions/nats.DeliverPolicy'
+      deliver_subject:
+        description: Push based consumers.
+        type: string
+      description:
+        type: string
+      durable_name:
+        type: string
+      filter_subject:
+        type: string
+      flow_control:
+        type: boolean
+      headers_only:
+        type: boolean
+      idle_heartbeat:
+        $ref: '#/definitions/time.Duration'
+      inactive_threshold:
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        description: Ephemeral inactivity threshold.
+      max_ack_pending:
+        type: integer
+      max_batch:
+        description: Pull based options.
+        type: integer
+      max_deliver:
+        type: integer
+      max_expires:
+        $ref: '#/definitions/time.Duration'
+      max_waiting:
+        type: integer
+      mem_storage:
+        description: Force memory storage.
+        type: boolean
+      num_replicas:
+        description: Generally inherited by parent stream and other markers, now can
+          be configured directly.
+        type: integer
+      opt_start_seq:
+        type: integer
+      opt_start_time:
+        type: string
+      rate_limit_bps:
+        description: Bits per sec
+        type: integer
+      replay_policy:
+        $ref: '#/definitions/nats.ReplayPolicy'
+      sample_freq:
+        type: string
+    type: object
+  nats.DeliverPolicy:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    type: integer
+    x-enum-varnames:
+    - DeliverAllPolicy
+    - DeliverLastPolicy
+    - DeliverNewPolicy
+    - DeliverByStartSequencePolicy
+    - DeliverByStartTimePolicy
+    - DeliverLastPerSubjectPolicy
+  nats.DiscardPolicy:
+    enum:
+    - 0
+    - 1
+    type: integer
+    x-enum-varnames:
+    - DiscardOld
+    - DiscardNew
+  nats.ExternalStream:
+    properties:
+      api:
+        type: string
+      deliver:
+        type: string
+    type: object
+  nats.Placement:
+    properties:
+      cluster:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  nats.ReplayPolicy:
+    enum:
+    - 0
+    - 1
+    type: integer
+    x-enum-varnames:
+    - ReplayInstantPolicy
+    - ReplayOriginalPolicy
+  nats.RetentionPolicy:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - LimitsPolicy
+    - InterestPolicy
+    - WorkQueuePolicy
+  nats.StorageType:
+    enum:
+    - 0
+    - 1
+    type: integer
+    x-enum-varnames:
+    - FileStorage
+    - MemoryStorage
+  nats.StreamConfig:
+    properties:
+      allow_rollup_hdrs:
+        type: boolean
+      deny_delete:
+        type: boolean
+      deny_purge:
+        type: boolean
+      description:
+        type: string
+      discard:
+        $ref: '#/definitions/nats.DiscardPolicy'
+      duplicate_window:
+        $ref: '#/definitions/time.Duration'
+      max_age:
+        $ref: '#/definitions/time.Duration'
+      max_bytes:
+        type: integer
+      max_consumers:
+        type: integer
+      max_msg_size:
+        type: integer
+      max_msgs:
+        type: integer
+      max_msgs_per_subject:
+        type: integer
+      mirror:
+        $ref: '#/definitions/nats.StreamSource'
+      name:
+        type: string
+      no_ack:
+        type: boolean
+      num_replicas:
+        type: integer
+      placement:
+        $ref: '#/definitions/nats.Placement'
+      republish:
+        allOf:
+        - $ref: '#/definitions/nats.SubjectMapping'
+        description: Allow republish of the message after being sequenced and stored.
+      retention:
+        $ref: '#/definitions/nats.RetentionPolicy'
+      sealed:
+        type: boolean
+      sources:
+        items:
+          $ref: '#/definitions/nats.StreamSource'
+        type: array
+      storage:
+        $ref: '#/definitions/nats.StorageType'
+      subjects:
+        items:
+          type: string
+        type: array
+      template_owner:
+        type: string
+    type: object
+  nats.StreamSource:
+    properties:
+      external:
+        $ref: '#/definitions/nats.ExternalStream'
+      filter_subject:
+        type: string
+      name:
+        type: string
+      opt_start_seq:
+        type: integer
+      opt_start_time:
+        type: string
+    type: object
+  nats.SubjectMapping:
+    properties:
+      dest:
+        type: string
+      src:
+        type: string
+    type: object
   src.AccountDescription:
     properties:
       iat:
@@ -49,6 +265,19 @@ definitions:
             type: integer
         type: object
       sub:
+        type: string
+    type: object
+  src.NATSResourceForm:
+    properties:
+      account:
+        type: string
+      operator:
+        type: string
+      server_url:
+        type: string
+      stream_name:
+        type: string
+      user:
         type: string
     type: object
   src.OperatorDescription:
@@ -151,6 +380,20 @@ definitions:
       start:
         type: string
     type: object
+  src.addNatsConsumerForm:
+    properties:
+      config:
+        $ref: '#/definitions/nats.ConsumerConfig'
+      meta:
+        $ref: '#/definitions/src.NATSResourceForm'
+    type: object
+  src.addNatsStreamForm:
+    properties:
+      config:
+        $ref: '#/definitions/nats.StreamConfig'
+      meta:
+        $ref: '#/definitions/src.NATSResourceForm'
+    type: object
   src.addOperatorForm:
     properties:
       expiry:
@@ -186,6 +429,15 @@ definitions:
       secret_name:
         type: string
       user:
+        type: string
+    type: object
+  src.postPushForm:
+    properties:
+      account:
+        type: string
+      operator:
+        type: string
+      server_list:
         type: string
     type: object
   src.storeConfigForm:
@@ -324,9 +576,29 @@ definitions:
         type: string
       operator:
         type: string
-      servers:
+      server:
         type: string
     type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
 info:
   contact: {}
 paths:
@@ -460,6 +732,104 @@ paths:
         in kubernetes secret
       tags:
       - Generate
+  /nats/consumer:
+    post:
+      parameters:
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addNatsConsumerForm'
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Gets consumers for user
+      tags:
+      - NATS
+  /nats/consumers:
+    get:
+      parameters:
+      - description: operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      - description: account name
+        in: query
+        name: account
+        required: true
+        type: string
+      - description: username
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: server url
+        in: query
+        name: server_url
+        type: string
+      - description: stream name
+        in: query
+        name: stream_name
+        type: string
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Gets consumers for user
+      tags:
+      - NATS
+  /nats/stream:
+    post:
+      parameters:
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addNatsStreamForm'
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add stream for user
+      tags:
+      - NATS
+  /nats/streams:
+    get:
+      parameters:
+      - description: operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      - description: account name
+        in: query
+        name: account
+        required: true
+        type: string
+      - description: username
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: server url
+        in: query
+        name: server_url
+        type: string
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Gets streams for user
+      tags:
+      - NATS
   /operator:
     post:
       description: Add an operator to the store
@@ -825,6 +1195,30 @@ paths:
       summary: List operators
       tags:
       - Operator
+  /pushAccount:
+    post:
+      description: Returns json with confirmation
+      parameters:
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.postPushForm'
+      responses:
+        "200":
+          description: Acknowledgement
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Push account to server
+      tags:
+      - Account
   /secret:
     post:
       parameters:

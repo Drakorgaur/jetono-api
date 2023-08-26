@@ -1,0 +1,14 @@
+{{- if .Values.volume.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations: {}
+  labels:
+    io.kompose.service: {{ .Values.volumes.name }}
+  name: {{ .Values.volumes.name }}
+spec:
+  accessModes: {{- toYaml .Values.volumes.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size | quote }}
+{{- end }}

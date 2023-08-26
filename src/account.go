@@ -7,20 +7,20 @@ import (
 )
 
 func init() {
-	module := "account"
-	initInfo(module)
+	root := GetEchoRoot()
+	root.POST("operator/:operator/account", addAccount)
 
-	GetEchoRoot().POST("operator/:operator/"+module, addAccount)
+	root.GET("operator/:operator/accounts", listAccounts)
 
-	GetEchoRoot().GET("operator/:operator/"+module+"s", listAccounts)
+	root.GET("operator/:operator/account/:name", describeAccount)
 
-	GetEchoRoot().GET("operator/:operator/"+module+"/:name", describeAccount)
+	root.PATCH("operator/:operator/account/:name", updateAccount)
 
-	GetEchoRoot().PATCH("operator/:operator/"+module+"/:name", updateAccount)
+	root.GET("bind", readBindAccountCtx)
 
-	GetEchoRoot().GET("bind", readBindAccountCtx)
+	root.POST("bind", bindAccountCtx)
 
-	GetEchoRoot().POST("bind", bindAccountCtx)
+	root.POST("pushAccount", pushAccount)
 }
 
 type addAccountForm struct {
@@ -236,5 +236,56 @@ func bindAccountCtx(c echo.Context) error {
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
 		Message: "Account bound",
+	})
+}
+
+type postPushForm struct {
+	Account             string `json:"account,omitempty" form:"account"`
+	Operator            string `json:"operator,omitempty" form:"operator"`
+	AccountJwtServerUrl string `json:"server_list,omitempty" form:"server_url"`
+}
+
+//	@Tags			Account
+//	@Router			/pushAccount [post]
+//	@Param			json	body	postPushForm	true	"json"
+//	@Summary		Push account to server
+//	@Description	Returns json with confirmation
+//	@Success		200	{object}	map[string]string	"Acknowledgement"
+//	@Failure		500	{object}	string				"Internal error"
+func pushAccount(c echo.Context) error {
+	var pushCmd = lookupCommand(nsc.GetRootCmd(), "push")
+
+	form := postPushForm{}
+	err := setFlagsIfInJson(pushCmd, &form, c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	accCtx := storage.AccountServerMap{
+		Operator: form.Operator,
+		Account:  form.Account,
+		Server:   form.AccountJwtServerUrl,
+	}
+
+	if accCtx.Server == "" {
+		err := storage.FillAccCtxFromStorage(&accCtx)
+		if err != nil {
+			return badRequest(c, err)
+		}
+	}
+
+	err = pushCmd.Flags().Set("account-jwt-server-url", accCtx.Server)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	err = pushCmd.RunE(pushCmd, []string{form.Account})
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, &SimpleJSONResponse{
+		Status:  "200",
+		Message: "Account pushed",
 	})
 }

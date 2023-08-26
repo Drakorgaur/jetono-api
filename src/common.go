@@ -78,7 +78,8 @@ func setFlagsIfInJson(cmd *cobra.Command, s interface{}, ctx echo.Context) error
 		formatterFlagName := strcase.KebabCase(flag)
 		f := cmd.Flag(formatterFlagName)
 		if f == nil {
-			return fmt.Errorf("flag %s not found", formatterFlagName)
+			fmt.Printf("flag %s not found\n", formatterFlagName)
+			continue
 		}
 		f.Changed = true
 		var finalValue string
