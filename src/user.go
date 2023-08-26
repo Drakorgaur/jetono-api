@@ -291,11 +291,11 @@ func updateUser(c echo.Context) error {
 }
 
 type getNATSResourceForm struct {
-	ServersList []string `json:"servers_list,omitempty" query:"servers_list"`
-	Operator    string   `json:"operator" param:"operator"`
-	Account     string   `json:"account" param:"account"`
-	User        string   `json:"user" param:"name"`
-	StreamName  string   `json:"stream_name,omitempty" param:"stream_name"`
+	ServersList []string `json:"servers_list,omitempty" query:"servers_list" `
+	Operator    string   `json:"operator" param:"operator" query:"operator"`
+	Account     string   `json:"account" param:"account" query:"account"`
+	User        string   `json:"user" param:"name" query:"name"`
+	StreamName  string   `json:"stream_name,omitempty" query:"stream_name"`
 }
 
 func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, error) {
@@ -324,17 +324,14 @@ func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, 
 	return u, form, nil
 }
 
-type streamsInfoResponse struct {
-	Streams []*nats.StreamInfo `json:"streams"`
-	Code    string             `json:"code"`
-}
-
-//	@Tags			NATS
-//	@Router			/nats/streams [get]
-//	@Param			json		body	getNATSResourceForm	true	"info about resources"
-//	@Summary		Gets streams for user
-//	@Success		200	{object}	streamsInfoResponse	"Status ok"
-//	@Failure		500	{object}	string				"Internal error"
+//	@Tags		NATS
+//	@Router		/nats/streams [get]
+//	@Param		operator		query	string	true	"operator name"
+//	@Param		account			query	string	true	"account name"
+//	@Param		user			query	string	true	"username"
+//	@Param		servers_list	query	string	false	"servers list"
+//	@Summary	Gets streams for user
+//	@Failure	500	{object}	string	"Internal error"
 func getUserStreams(c echo.Context) error {
 	u, _, err := initUserNatsConn(c)
 	if err != nil {
@@ -361,17 +358,15 @@ func getUserStreams(c echo.Context) error {
 	})
 }
 
-type consumersInfoResponse struct {
-	Consumers []*nats.ConsumerInfo `json:"consumers"`
-	Code      string               `json:"code"`
-}
-
-//	@Tags			NATS
-//	@Router			/nats/consumers [get]
-//	@Param			json		body	getNATSResourceForm	true	"info about resources"
-//	@Summary		Gets consumers for user
-//	@Success		200	{object}	consumersInfoResponse	"Status ok"
-//	@Failure		500	{object}	string				"Internal error"
+//	@Tags		NATS
+//	@Router		/nats/consumers [get]
+//	@Param		operator		query	string	true	"operator name"
+//	@Param		account			query	string	true	"account name"
+//	@Param		user			query	string	true	"username"
+//	@Param		servers_list	query	string	false	"servers list"
+//	@Param		stream_name		query	string	false	"stream name"
+//	@Summary	Gets consumers for user
+//	@Failure	500	{object}	string	"Internal error"
 func getUserConsumers(c echo.Context) error {
 	u, form, err := initUserNatsConn(c)
 	if err != nil {

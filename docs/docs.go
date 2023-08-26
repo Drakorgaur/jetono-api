@@ -212,6 +212,102 @@ const docTemplate = `{
                 }
             }
         },
+        "/nats/consumers": {
+            "get": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Gets consumers for user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "account name",
+                        "name": "account",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "servers list",
+                        "name": "servers_list",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "stream name",
+                        "name": "stream_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/nats/streams": {
+            "get": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Gets streams for user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "account name",
+                        "name": "account",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "servers list",
+                        "name": "servers_list",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/operator": {
             "post": {
                 "description": "Add an operator to the store",

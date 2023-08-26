@@ -460,6 +460,70 @@ paths:
         in kubernetes secret
       tags:
       - Generate
+  /nats/consumers:
+    get:
+      parameters:
+      - description: operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      - description: account name
+        in: query
+        name: account
+        required: true
+        type: string
+      - description: username
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: servers list
+        in: query
+        name: servers_list
+        type: string
+      - description: stream name
+        in: query
+        name: stream_name
+        type: string
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Gets consumers for user
+      tags:
+      - NATS
+  /nats/streams:
+    get:
+      parameters:
+      - description: operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      - description: account name
+        in: query
+        name: account
+        required: true
+        type: string
+      - description: username
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: servers list
+        in: query
+        name: servers_list
+        type: string
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Gets streams for user
+      tags:
+      - NATS
   /operator:
     post:
       description: Add an operator to the store
