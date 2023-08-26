@@ -30,6 +30,10 @@ func init() {
 	root.GET("nats/streams", getUserStreams)
 
 	root.GET("nats/consumers", getUserConsumers)
+
+	root.POST("nats/stream", addStream)
+
+	root.POST("nats/consumer", addConsumer)
 }
 
 type addUserForm struct {
@@ -289,7 +293,7 @@ func updateUser(c echo.Context) error {
 	})
 }
 
-type getNATSResourceForm struct {
+type NATSResourceForm struct {
 	ServerUrl  string `json:"server_url,omitempty" query:"server_url" `
 	Operator   string `json:"operator" param:"operator" query:"operator"`
 	Account    string `json:"account" param:"account" query:"account"`
@@ -297,8 +301,8 @@ type getNATSResourceForm struct {
 	StreamName string `json:"stream_name,omitempty" query:"stream_name"`
 }
 
-func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *getNATSResourceForm, error) {
-	form := new(getNATSResourceForm)
+func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *NATSResourceForm, error) {
+	form := new(NATSResourceForm)
 	if err := c.Bind(form); err != nil {
 		return nil, form, err
 	}
@@ -385,5 +389,77 @@ func getUserConsumers(c echo.Context) error {
 	return c.JSON(200, map[string]any{
 		"code":      "200",
 		"consumers": response,
+	})
+}
+
+type addNatsStreamForm struct {
+	Meta   *NATSResourceForm  `json:"meta"`
+	Config *nats.StreamConfig `json:"config"`
+}
+
+//	@Tags		NATS
+//	@Router		/nats/stream [post]
+//	@Param		json body	addNatsStreamForm	true	"json"
+//	@Summary	Add stream for user
+//	@Failure	500	{object}	string	"Internal error"
+func addStream(c echo.Context) error {
+	form := addNatsStreamForm{}
+	if err := c.Bind(&form); err != nil {
+		return badRequest(c, err)
+	}
+
+	u := &lib.UserNatsConn{
+		AccountServerMap: &storage.AccountServerMap{
+			Operator: form.Meta.Operator,
+			Account:  form.Meta.Account,
+			Server:   form.Meta.ServerUrl,
+		},
+		User: form.Meta.User,
+	}
+
+	stream, err := u.AddStream(form.Config)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":   "200",
+		"stream": stream,
+	})
+}
+
+type addNatsConsumerForm struct {
+	Meta   *NATSResourceForm    `json:"meta"`
+	Config *nats.ConsumerConfig `json:"config"`
+}
+
+//	@Tags		NATS
+//	@Router		/nats/consumer [post]
+//	@Param		json	body	addNatsConsumerForm	true	"json"
+//	@Summary	Gets consumers for user
+//	@Failure	500	{object}	string	"Internal error"
+func addConsumer(c echo.Context) error {
+	form := addNatsConsumerForm{}
+	if err := c.Bind(&form); err != nil {
+		return badRequest(c, err)
+	}
+
+	u := &lib.UserNatsConn{
+		AccountServerMap: &storage.AccountServerMap{
+			Operator: form.Meta.Operator,
+			Account:  form.Meta.Account,
+			Server:   form.Meta.ServerUrl,
+		},
+		User: form.Meta.User,
+	}
+
+	stream, err := u.AddConsumer(form.Meta.StreamName, form.Config)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":   "200",
+		"stream": stream,
 	})
 }

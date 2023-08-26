@@ -15,3 +15,17 @@ func (u *UserNatsConn) GetStreams() (<-chan *nats.StreamInfo, error) {
 
 	return js.StreamsInfo(), nil
 }
+
+func (u *UserNatsConn) AddStream(config *nats.StreamConfig) (*nats.StreamInfo, error) {
+	nc, err := u.GetNats()
+	if err != nil {
+		return nil, err
+	}
+
+	js, err := nc.JetStream()
+	if err != nil {
+		return nil, err
+	}
+
+	return js.AddStream(config)
+}
