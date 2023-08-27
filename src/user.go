@@ -501,21 +501,35 @@ func getUserKV(c echo.Context) error {
 }
 
 type JsonifyKeyValueConfig struct {
-	Parent       *nats.KeyValueConfig
-	Bucket       string        `json:"bucket,omitempty"`
-	MaxValueSize int32         `json:"max_value_size,omitempty"`
-	TTL          time.Duration `json:"ttl,omitempty"`
-	MaxBytes     int64         `json:"max_bytes,omitempty"`
-	Replicas     int           `json:"replicas,omitempty"`
+	Bucket       string               `json:"bucket,omitempty"`
+	Description  string               `json:"description,omitempty"`
+	MaxValueSize int32                `json:"max_value_size,omitempty"`
+	History      uint8                `json:"history,omitempty"`
+	TTL          time.Duration        `json:"ttl,omitempty"`
+	MaxBytes     int64                `json:"max_bytes,omitempty"`
+	Storage      nats.StorageType     `json:"storage,omitempty"`
+	Replicas     int                  `json:"replicas,omitempty"`
+	Placement    *nats.Placement      `json:"placement,omitempty"`
+	RePublish    *nats.RePublish      `json:"re_publish,omitempty"`
+	Mirror       *nats.StreamSource   `json:"mirror,omitempty"`
+	Sources      []*nats.StreamSource `json:"sources,omitempty"`
 }
 
 func (c *JsonifyKeyValueConfig) KeyValueConfig() *nats.KeyValueConfig {
-	c.Parent.Bucket = c.Bucket
-	c.Parent.MaxValueSize = c.MaxValueSize
-	c.Parent.TTL = c.TTL
-	c.Parent.MaxBytes = c.MaxBytes
-	c.Parent.Replicas = c.Replicas
-	return c.Parent
+	return &nats.KeyValueConfig{
+		Bucket:       c.Bucket,
+		Description:  c.Description,
+		MaxValueSize: c.MaxValueSize,
+		History:      c.History,
+		TTL:          c.TTL,
+		MaxBytes:     c.MaxBytes,
+		Storage:      c.Storage,
+		Replicas:     c.Replicas,
+		Placement:    c.Placement,
+		RePublish:    c.RePublish,
+		Mirror:       c.Mirror,
+		Sources:      c.Sources,
+	}
 }
 
 type addNatsKVForm struct {
