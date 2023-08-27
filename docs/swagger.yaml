@@ -794,13 +794,13 @@ paths:
         name: json
         required: true
         schema:
-          $ref: '#/definitions/src.addNatsKVForm'
+          $ref: '#/definitions/src.addNatsConsumerForm'
       responses:
         "500":
           description: Internal error
           schema:
             type: string
-      summary: Add kv for user
+      summary: Add consumer for user
       tags:
       - NATS
   /nats/consumers:
@@ -835,6 +835,23 @@ paths:
           schema:
             type: string
       summary: Gets consumers for user
+      tags:
+      - NATS
+  /nats/kv:
+    post:
+      parameters:
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addNatsKVForm'
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add kv for user
       tags:
       - NATS
   /nats/kvs:

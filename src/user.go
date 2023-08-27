@@ -505,7 +505,7 @@ type addNatsKVForm struct {
 }
 
 //	@Tags		NATS
-//	@Router		/nats/consumer [post]
+//	@Router		/nats/kv [post]
 //	@Param		json	body	addNatsKVForm	true	"json"
 //	@Summary	Add kv for user
 //	@Failure	500	{object}	string	"Internal error"

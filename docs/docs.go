@@ -217,7 +217,7 @@ const docTemplate = `{
                 "tags": [
                     "NATS"
                 ],
-                "summary": "Add kv for user",
+                "summary": "Add consumer for user",
                 "parameters": [
                     {
                         "description": "json",
@@ -225,7 +225,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/src.addNatsKVForm"
+                            "$ref": "#/definitions/src.addNatsConsumerForm"
                         }
                     }
                 ],
@@ -278,6 +278,33 @@ const docTemplate = `{
                         "description": "stream name",
                         "name": "stream_name",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/nats/kv": {
+            "post": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Add kv for user",
+                "parameters": [
+                    {
+                        "description": "json",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addNatsKVForm"
+                        }
                     }
                 ],
                 "responses": {
