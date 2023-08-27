@@ -10,6 +10,7 @@ import (
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 func init() {
@@ -499,9 +500,27 @@ func getUserKV(c echo.Context) error {
 	})
 }
 
+type JsonifyKeyValueConfig struct {
+	Parent       *nats.KeyValueConfig
+	Bucket       string        `json:"bucket,omitempty"`
+	MaxValueSize int32         `json:"max_value_size,omitempty"`
+	TTL          time.Duration `json:"ttl,omitempty"`
+	MaxBytes     int64         `json:"max_bytes,omitempty"`
+	Replicas     int           `json:"replicas,omitempty"`
+}
+
+func (c *JsonifyKeyValueConfig) KeyValueConfig() *nats.KeyValueConfig {
+	c.Parent.Bucket = c.Bucket
+	c.Parent.MaxValueSize = c.MaxValueSize
+	c.Parent.TTL = c.TTL
+	c.Parent.MaxBytes = c.MaxBytes
+	c.Parent.Replicas = c.Replicas
+	return c.Parent
+}
+
 type addNatsKVForm struct {
-	Meta   *NATSResourceForm    `json:"meta"`
-	Config *nats.KeyValueConfig `json:"config"`
+	Meta   *NATSResourceForm      `json:"meta"`
+	Config *JsonifyKeyValueConfig `json:"config"`
 }
 
 //	@Tags		NATS
@@ -524,7 +543,7 @@ func addUserKV(c echo.Context) error {
 		User: form.Meta.User,
 	}
 
-	kv, err := u.AddKV(form.Config)
+	kv, err := u.AddKV(form.Config.KeyValueConfig())
 	if err != nil {
 		return badRequest(c, err)
 	}
