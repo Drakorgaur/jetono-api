@@ -6,9 +6,8 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/labstack/echo/v4 v4.11.1
-	github.com/nats-io/jwt/v2 v2.4.1
-	github.com/nats-io/nats.go v1.16.0
-	github.com/nats-io/nkeys v0.4.4
+	github.com/nats-io/jwt/v2 v2.5.0
+	github.com/nats-io/nats.go v1.28.0
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
 	github.com/objectbox/objectbox-go v1.7.0
 	github.com/spf13/cobra v1.7.0
@@ -50,6 +49,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -63,6 +63,7 @@ require (
 	github.com/nats-io/cliprompts/v2 v2.0.0-20191226174129-372d79b36768 // indirect
 	github.com/nats-io/jsm.go v0.0.33 // indirect
 	github.com/nats-io/jwt v1.2.3-0.20210314221642-a826c77dc9d2 // indirect
+	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/objectbox/objectbox-generator v0.13.0 // indirect
 	github.com/rhysd/go-github-selfupdate v1.2.2 // indirect

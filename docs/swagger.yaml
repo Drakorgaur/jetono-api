@@ -41,11 +41,13 @@ definitions:
       inactive_threshold:
         allOf:
         - $ref: '#/definitions/time.Duration'
-        description: Ephemeral inactivity threshold.
+        description: Inactivity threshold.
       max_ack_pending:
         type: integer
       max_batch:
         description: Pull based options.
+        type: integer
+      max_bytes:
         type: integer
       max_deliver:
         type: integer
@@ -56,6 +58,8 @@ definitions:
       mem_storage:
         description: Force memory storage.
         type: boolean
+      name:
+        type: string
       num_replicas:
         description: Generally inherited by parent stream and other markers, now can
           be configured directly.
@@ -103,6 +107,35 @@ definitions:
       deliver:
         type: string
     type: object
+  nats.KeyValueConfig:
+    properties:
+      bucket:
+        type: string
+      description:
+        type: string
+      history:
+        type: integer
+      maxBytes:
+        type: integer
+      maxValueSize:
+        type: integer
+      mirror:
+        $ref: '#/definitions/nats.StreamSource'
+      placement:
+        $ref: '#/definitions/nats.Placement'
+      rePublish:
+        $ref: '#/definitions/nats.RePublish'
+      replicas:
+        type: integer
+      sources:
+        items:
+          $ref: '#/definitions/nats.StreamSource'
+        type: array
+      storage:
+        $ref: '#/definitions/nats.StorageType'
+      ttl:
+        $ref: '#/definitions/time.Duration'
+    type: object
   nats.Placement:
     properties:
       cluster:
@@ -111,6 +144,15 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  nats.RePublish:
+    properties:
+      dest:
+        type: string
+      headers_only:
+        type: boolean
+      src:
+        type: string
     type: object
   nats.ReplayPolicy:
     enum:
@@ -140,6 +182,10 @@ definitions:
     - MemoryStorage
   nats.StreamConfig:
     properties:
+      allow_direct:
+        description: Allow higher performance, direct access to get individual messages.
+          E.g. KeyValue
+        type: boolean
       allow_rollup_hdrs:
         type: boolean
       deny_delete:
@@ -150,6 +196,8 @@ definitions:
         type: string
       discard:
         $ref: '#/definitions/nats.DiscardPolicy'
+      discard_new_per_subject:
+        type: boolean
       duplicate_window:
         $ref: '#/definitions/time.Duration'
       max_age:
@@ -166,6 +214,10 @@ definitions:
         type: integer
       mirror:
         $ref: '#/definitions/nats.StreamSource'
+      mirror_direct:
+        description: Allow higher performance and unified direct access for mirrors
+          as well.
+        type: boolean
       name:
         type: string
       no_ack:
@@ -176,7 +228,7 @@ definitions:
         $ref: '#/definitions/nats.Placement'
       republish:
         allOf:
-        - $ref: '#/definitions/nats.SubjectMapping'
+        - $ref: '#/definitions/nats.RePublish'
         description: Allow republish of the message after being sequenced and stored.
       retention:
         $ref: '#/definitions/nats.RetentionPolicy'
@@ -206,13 +258,6 @@ definitions:
       opt_start_seq:
         type: integer
       opt_start_time:
-        type: string
-    type: object
-  nats.SubjectMapping:
-    properties:
-      dest:
-        type: string
-      src:
         type: string
     type: object
   src.AccountDescription:
@@ -270,6 +315,8 @@ definitions:
   src.NATSResourceForm:
     properties:
       account:
+        type: string
+      bucket_name:
         type: string
       operator:
         type: string
@@ -384,6 +431,13 @@ definitions:
     properties:
       config:
         $ref: '#/definitions/nats.ConsumerConfig'
+      meta:
+        $ref: '#/definitions/src.NATSResourceForm'
+    type: object
+  src.addNatsKVForm:
+    properties:
+      config:
+        $ref: '#/definitions/nats.KeyValueConfig'
       meta:
         $ref: '#/definitions/src.NATSResourceForm'
     type: object
@@ -746,7 +800,7 @@ paths:
           description: Internal error
           schema:
             type: string
-      summary: Gets consumers for user
+      summary: Add consumer for user
       tags:
       - NATS
   /nats/consumers:
@@ -781,6 +835,53 @@ paths:
           schema:
             type: string
       summary: Gets consumers for user
+      tags:
+      - NATS
+  /nats/kv:
+    post:
+      parameters:
+      - description: json
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addNatsKVForm'
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add kv for user
+      tags:
+      - NATS
+  /nats/kvs:
+    get:
+      parameters:
+      - description: operator name
+        in: query
+        name: operator
+        required: true
+        type: string
+      - description: account name
+        in: query
+        name: account
+        required: true
+        type: string
+      - description: username
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: server url
+        in: query
+        name: server_url
+        type: string
+      responses:
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Gets kvs for user
       tags:
       - NATS
   /nats/stream:

@@ -10,6 +10,7 @@ import (
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 func init() {
@@ -31,9 +32,13 @@ func init() {
 
 	root.GET("nats/consumers", getUserConsumers)
 
+	root.GET("nats/kvs", getUserKV)
+
 	root.POST("nats/stream", addStream)
 
 	root.POST("nats/consumer", addConsumer)
+
+	root.POST("nats/kv", addUserKV)
 }
 
 type addUserForm struct {
@@ -299,6 +304,7 @@ type NATSResourceForm struct {
 	Account    string `json:"account" param:"account" query:"account"`
 	User       string `json:"user" param:"name" query:"user"`
 	StreamName string `json:"stream_name,omitempty" query:"stream_name"`
+	BucketName string `json:"bucket_name,omitempty" query:"bucket_name"`
 }
 
 func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *NATSResourceForm, error) {
@@ -399,7 +405,7 @@ type addNatsStreamForm struct {
 
 //	@Tags		NATS
 //	@Router		/nats/stream [post]
-//	@Param		json body	addNatsStreamForm	true	"json"
+//	@Param		json	body	addNatsStreamForm	true	"json"
 //	@Summary	Add stream for user
 //	@Failure	500	{object}	string	"Internal error"
 func addStream(c echo.Context) error {
@@ -436,7 +442,7 @@ type addNatsConsumerForm struct {
 //	@Tags		NATS
 //	@Router		/nats/consumer [post]
 //	@Param		json	body	addNatsConsumerForm	true	"json"
-//	@Summary	Gets consumers for user
+//	@Summary	Add consumer for user
 //	@Failure	500	{object}	string	"Internal error"
 func addConsumer(c echo.Context) error {
 	form := addNatsConsumerForm{}
@@ -453,13 +459,111 @@ func addConsumer(c echo.Context) error {
 		User: form.Meta.User,
 	}
 
-	stream, err := u.AddConsumer(form.Meta.StreamName, form.Config)
+	consumer, err := u.AddConsumer(form.Meta.StreamName, form.Config)
 	if err != nil {
 		return badRequest(c, err)
 	}
 
 	return c.JSON(200, map[string]any{
-		"code":   "200",
-		"stream": stream,
+		"code":     "200",
+		"consumer": consumer,
+	})
+}
+
+//	@Tags		NATS
+//	@Router		/nats/kvs [get]
+//	@Param		operator	query	string	true	"operator name"
+//	@Param		account		query	string	true	"account name"
+//	@Param		user		query	string	true	"username"
+//	@Param		server_url	query	string	false	"server url"
+//	@Summary	Gets kvs for user
+//	@Failure	500	{object}	string	"Internal error"
+func getUserKV(c echo.Context) error {
+	u, _, err := initUserNatsConn(c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	kvs, err := u.GetKVs()
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	var response []string
+	for kv := range kvs {
+		response = append(response, kv)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":      "200",
+		"consumers": response,
+	})
+}
+
+type JsonifyKeyValueConfig struct {
+	Bucket       string               `json:"bucket,omitempty"`
+	Description  string               `json:"description,omitempty"`
+	MaxValueSize int32                `json:"max_value_size,omitempty"`
+	History      uint8                `json:"history,omitempty"`
+	TTL          time.Duration        `json:"ttl,omitempty"`
+	MaxBytes     int64                `json:"max_bytes,omitempty"`
+	Storage      nats.StorageType     `json:"storage,omitempty"`
+	Replicas     int                  `json:"replicas,omitempty"`
+	Placement    *nats.Placement      `json:"placement,omitempty"`
+	RePublish    *nats.RePublish      `json:"re_publish,omitempty"`
+	Mirror       *nats.StreamSource   `json:"mirror,omitempty"`
+	Sources      []*nats.StreamSource `json:"sources,omitempty"`
+}
+
+func (c *JsonifyKeyValueConfig) KeyValueConfig() *nats.KeyValueConfig {
+	return &nats.KeyValueConfig{
+		Bucket:       c.Bucket,
+		Description:  c.Description,
+		MaxValueSize: c.MaxValueSize,
+		History:      c.History,
+		TTL:          c.TTL,
+		MaxBytes:     c.MaxBytes,
+		Storage:      c.Storage,
+		Replicas:     c.Replicas,
+		Placement:    c.Placement,
+		RePublish:    c.RePublish,
+		Mirror:       c.Mirror,
+		Sources:      c.Sources,
+	}
+}
+
+type addNatsKVForm struct {
+	Meta   *NATSResourceForm      `json:"meta"`
+	Config *JsonifyKeyValueConfig `json:"config"`
+}
+
+//	@Tags		NATS
+//	@Router		/nats/kv [post]
+//	@Param		json	body	addNatsKVForm	true	"json"
+//	@Summary	Add kv for user
+//	@Failure	500	{object}	string	"Internal error"
+func addUserKV(c echo.Context) error {
+	form := addNatsKVForm{}
+	if err := c.Bind(&form); err != nil {
+		return badRequest(c, err)
+	}
+
+	u := &lib.UserNatsConn{
+		AccountServerMap: &storage.AccountServerMap{
+			Operator: form.Meta.Operator,
+			Account:  form.Meta.Account,
+			Server:   form.Meta.ServerUrl,
+		},
+		User: form.Meta.User,
+	}
+
+	kv, err := u.AddKV(form.Config.KeyValueConfig())
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code": "200",
+		"kv":   kv,
 	})
 }
