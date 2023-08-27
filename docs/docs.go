@@ -217,7 +217,7 @@ const docTemplate = `{
                 "tags": [
                     "NATS"
                 ],
-                "summary": "Gets consumers for user",
+                "summary": "Add kv for user",
                 "parameters": [
                     {
                         "description": "json",
@@ -225,7 +225,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/src.addNatsConsumerForm"
+                            "$ref": "#/definitions/src.addNatsKVForm"
                         }
                     }
                 ],
@@ -277,6 +277,51 @@ const docTemplate = `{
                         "type": "string",
                         "description": "stream name",
                         "name": "stream_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/nats/kvs": {
+            "get": {
+                "tags": [
+                    "NATS"
+                ],
+                "summary": "Gets kvs for user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "operator name",
+                        "name": "operator",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "account name",
+                        "name": "account",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "server url",
+                        "name": "server_url",
                         "in": "query"
                     }
                 ],
@@ -1037,7 +1082,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/time.Duration"
                 },
                 "inactive_threshold": {
-                    "description": "Ephemeral inactivity threshold.",
+                    "description": "Inactivity threshold.",
                     "allOf": [
                         {
                             "$ref": "#/definitions/time.Duration"
@@ -1049,6 +1094,9 @@ const docTemplate = `{
                 },
                 "max_batch": {
                     "description": "Pull based options.",
+                    "type": "integer"
+                },
+                "max_bytes": {
                     "type": "integer"
                 },
                 "max_deliver": {
@@ -1063,6 +1111,9 @@ const docTemplate = `{
                 "mem_storage": {
                     "description": "Force memory storage.",
                     "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "num_replicas": {
                     "description": "Generally inherited by parent stream and other markers, now can be configured directly.",
@@ -1127,6 +1178,50 @@ const docTemplate = `{
                 }
             }
         },
+        "nats.KeyValueConfig": {
+            "type": "object",
+            "properties": {
+                "bucket": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "history": {
+                    "type": "integer"
+                },
+                "maxBytes": {
+                    "type": "integer"
+                },
+                "maxValueSize": {
+                    "type": "integer"
+                },
+                "mirror": {
+                    "$ref": "#/definitions/nats.StreamSource"
+                },
+                "placement": {
+                    "$ref": "#/definitions/nats.Placement"
+                },
+                "rePublish": {
+                    "$ref": "#/definitions/nats.RePublish"
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/nats.StreamSource"
+                    }
+                },
+                "storage": {
+                    "$ref": "#/definitions/nats.StorageType"
+                },
+                "ttl": {
+                    "$ref": "#/definitions/time.Duration"
+                }
+            }
+        },
         "nats.Placement": {
             "type": "object",
             "properties": {
@@ -1138,6 +1233,20 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "nats.RePublish": {
+            "type": "object",
+            "properties": {
+                "dest": {
+                    "type": "string"
+                },
+                "headers_only": {
+                    "type": "boolean"
+                },
+                "src": {
+                    "type": "string"
                 }
             }
         },
@@ -1179,6 +1288,10 @@ const docTemplate = `{
         "nats.StreamConfig": {
             "type": "object",
             "properties": {
+                "allow_direct": {
+                    "description": "Allow higher performance, direct access to get individual messages. E.g. KeyValue",
+                    "type": "boolean"
+                },
                 "allow_rollup_hdrs": {
                     "type": "boolean"
                 },
@@ -1193,6 +1306,9 @@ const docTemplate = `{
                 },
                 "discard": {
                     "$ref": "#/definitions/nats.DiscardPolicy"
+                },
+                "discard_new_per_subject": {
+                    "type": "boolean"
                 },
                 "duplicate_window": {
                     "$ref": "#/definitions/time.Duration"
@@ -1218,6 +1334,10 @@ const docTemplate = `{
                 "mirror": {
                     "$ref": "#/definitions/nats.StreamSource"
                 },
+                "mirror_direct": {
+                    "description": "Allow higher performance and unified direct access for mirrors as well.",
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -1234,7 +1354,7 @@ const docTemplate = `{
                     "description": "Allow republish of the message after being sequenced and stored.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/nats.SubjectMapping"
+                            "$ref": "#/definitions/nats.RePublish"
                         }
                     ]
                 },
@@ -1280,17 +1400,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "opt_start_time": {
-                    "type": "string"
-                }
-            }
-        },
-        "nats.SubjectMapping": {
-            "type": "object",
-            "properties": {
-                "dest": {
-                    "type": "string"
-                },
-                "src": {
                     "type": "string"
                 }
             }
@@ -1378,6 +1487,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account": {
+                    "type": "string"
+                },
+                "bucket_name": {
                     "type": "string"
                 },
                 "operator": {
@@ -1552,6 +1664,17 @@ const docTemplate = `{
             "properties": {
                 "config": {
                     "$ref": "#/definitions/nats.ConsumerConfig"
+                },
+                "meta": {
+                    "$ref": "#/definitions/src.NATSResourceForm"
+                }
+            }
+        },
+        "src.addNatsKVForm": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/nats.KeyValueConfig"
                 },
                 "meta": {
                     "$ref": "#/definitions/src.NATSResourceForm"

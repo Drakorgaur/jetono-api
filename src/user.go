@@ -31,7 +31,7 @@ func init() {
 
 	root.GET("nats/consumers", getUserConsumers)
 
-	root.GET("nats/kv", getUserKV)
+	root.GET("nats/kvs", getUserKV)
 
 	root.POST("nats/stream", addStream)
 
@@ -441,7 +441,7 @@ type addNatsConsumerForm struct {
 //	@Tags		NATS
 //	@Router		/nats/consumer [post]
 //	@Param		json	body	addNatsConsumerForm	true	"json"
-//	@Summary	Gets consumers for user
+//	@Summary	Add consumer for user
 //	@Failure	500	{object}	string	"Internal error"
 func addConsumer(c echo.Context) error {
 	form := addNatsConsumerForm{}
@@ -469,6 +469,14 @@ func addConsumer(c echo.Context) error {
 	})
 }
 
+//	@Tags		NATS
+//	@Router		/nats/kvs [get]
+//	@Param		operator	query	string	true	"operator name"
+//	@Param		account		query	string	true	"account name"
+//	@Param		user		query	string	true	"username"
+//	@Param		server_url	query	string	false	"server url"
+//	@Summary	Gets kvs for user
+//	@Failure	500	{object}	string	"Internal error"
 func getUserKV(c echo.Context) error {
 	u, _, err := initUserNatsConn(c)
 	if err != nil {
@@ -496,6 +504,11 @@ type addNatsKVForm struct {
 	Config *nats.KeyValueConfig `json:"config"`
 }
 
+//	@Tags		NATS
+//	@Router		/nats/consumer [post]
+//	@Param		json	body	addNatsKVForm	true	"json"
+//	@Summary	Add kv for user
+//	@Failure	500	{object}	string	"Internal error"
 func addUserKV(c echo.Context) error {
 	form := addNatsKVForm{}
 	if err := c.Bind(&form); err != nil {
