@@ -31,9 +31,13 @@ func init() {
 
 	root.GET("nats/consumers", getUserConsumers)
 
+	root.GET("nats/kv", getUserKV)
+
 	root.POST("nats/stream", addStream)
 
 	root.POST("nats/consumer", addConsumer)
+
+	root.POST("nats/kv", addUserKV)
 }
 
 type addUserForm struct {
@@ -299,6 +303,7 @@ type NATSResourceForm struct {
 	Account    string `json:"account" param:"account" query:"account"`
 	User       string `json:"user" param:"name" query:"user"`
 	StreamName string `json:"stream_name,omitempty" query:"stream_name"`
+	BucketName string `json:"bucket_name,omitempty" query:"bucket_name"`
 }
 
 func initUserNatsConn(c echo.Context) (*lib.UserNatsConn, *NATSResourceForm, error) {
@@ -399,7 +404,7 @@ type addNatsStreamForm struct {
 
 //	@Tags		NATS
 //	@Router		/nats/stream [post]
-//	@Param		json body	addNatsStreamForm	true	"json"
+//	@Param		json	body	addNatsStreamForm	true	"json"
 //	@Summary	Add stream for user
 //	@Failure	500	{object}	string	"Internal error"
 func addStream(c echo.Context) error {
@@ -453,13 +458,66 @@ func addConsumer(c echo.Context) error {
 		User: form.Meta.User,
 	}
 
-	stream, err := u.AddConsumer(form.Meta.StreamName, form.Config)
+	consumer, err := u.AddConsumer(form.Meta.StreamName, form.Config)
 	if err != nil {
 		return badRequest(c, err)
 	}
 
 	return c.JSON(200, map[string]any{
-		"code":   "200",
-		"stream": stream,
+		"code":     "200",
+		"consumer": consumer,
+	})
+}
+
+func getUserKV(c echo.Context) error {
+	u, _, err := initUserNatsConn(c)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	kvs, err := u.GetKVs()
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	var response []string
+	for kv := range kvs {
+		response = append(response, kv)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code":      "200",
+		"consumers": response,
+	})
+}
+
+type addNatsKVForm struct {
+	Meta   *NATSResourceForm    `json:"meta"`
+	Config *nats.KeyValueConfig `json:"config"`
+}
+
+func addUserKV(c echo.Context) error {
+	form := addNatsKVForm{}
+	if err := c.Bind(&form); err != nil {
+		return badRequest(c, err)
+	}
+
+	u := &lib.UserNatsConn{
+		AccountServerMap: &storage.AccountServerMap{
+			Operator: form.Meta.Operator,
+			Account:  form.Meta.Account,
+			Server:   form.Meta.ServerUrl,
+		},
+		User: form.Meta.User,
+	}
+
+	kv, err := u.AddKV(form.Config)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, map[string]any{
+		"code": "200",
+		"kv":   kv,
 	})
 }

@@ -6,8 +6,8 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/labstack/echo/v4 v4.11.1
-	github.com/nats-io/jwt/v2 v2.4.1
-	github.com/nats-io/nats.go v1.16.0
+	github.com/nats-io/jwt/v2 v2.5.0
+	github.com/nats-io/nats.go v1.28.0
 	github.com/nats-io/nkeys v0.4.4
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
 	github.com/objectbox/objectbox-go v1.7.0
