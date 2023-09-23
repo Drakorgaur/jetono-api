@@ -35,15 +35,10 @@ type addOperatorForm struct {
 //	@Failure		400		{object}	SimpleJSONResponse	"Bad request"
 //	@Failure		500		{object}	string				"Internal error"
 func addOperator(c echo.Context) error {
-	var addCmd = lookupCommand(nsc.GetRootCmd(), "add")
-	var addOperatorCmd = lookupCommand(addCmd, "operator")
+	form := addOperatorForm{}
 
-	err := setFlagsIfInJson(addOperatorCmd, &addOperatorForm{}, c)
+	err := runNsc(&form, c, "add", "operator")
 	if err != nil {
-		return badRequest(c, err)
-	}
-
-	if err := addOperatorCmd.RunE(addOperatorCmd, []string{c.FormValue("name")}); err != nil {
 		return badRequest(c, err)
 	}
 
