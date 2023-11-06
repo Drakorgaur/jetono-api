@@ -1,7 +1,6 @@
 package src
 
 import (
-	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
 )
@@ -15,12 +14,6 @@ func init() {
 	root.GET("operator/:operator/account/:name", describeAccount)
 
 	root.PATCH("operator/:operator/account/:name", updateAccount)
-
-	root.GET("bind", readBindAccountCtx)
-
-	root.POST("bind", bindAccountCtx)
-
-	root.POST("pushAccount", pushAccount)
 }
 
 type addAccountForm struct {
@@ -179,113 +172,5 @@ func updateAccount(c echo.Context) error {
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
 		Message: "Account updated",
-	})
-}
-
-//	@Tags			Account
-//	@Router			/bind [get]
-//	@Param			account		query	string	true	"Account name"
-//	@Param			operator	query	string	true	"Operator name"
-//	@Summary		read context bound to account
-//	@Description	Returns json object with context
-//	@Success		200	{object}	map[string]string	"Operator description"
-//	@Failure		500	{object}	string				"Internal error"
-func readBindAccountCtx(c echo.Context) error {
-	store, err := storage.StoreType()
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	ent := storage.AccountServerMap{
-		Operator: c.QueryParam("operator"),
-		Account:  c.QueryParam("account"),
-	}
-	err = store.ReadCtx(&ent)
-
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	return c.JSON(200, &ent)
-}
-
-//	@Tags			Account
-//	@Router			/bind [post]
-//	@Param			json	body	storage.AccountServerMap	true	"json"
-//	@Summary		Bind context to account
-//	@Description	Returns json with confirmation
-//	@Success		200	{object}	map[string]string	"Operator description"
-//	@Failure		500	{object}	string				"Internal error"
-func bindAccountCtx(c echo.Context) error {
-	var form storage.AccountServerMap
-	store, err := storage.StoreType()
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	err = c.Bind(&form)
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	err = store.StoreCtx(&form)
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	return c.JSON(200, &SimpleJSONResponse{
-		Status:  "200",
-		Message: "Account bound",
-	})
-}
-
-type postPushForm struct {
-	Account             string `json:"account,omitempty" form:"account"`
-	Operator            string `json:"operator,omitempty" form:"operator"`
-	AccountJwtServerUrl string `json:"server_list,omitempty" form:"server_url"`
-}
-
-//	@Tags			Account
-//	@Router			/pushAccount [post]
-//	@Param			json	body	postPushForm	true	"json"
-//	@Summary		Push account to server
-//	@Description	Returns json with confirmation
-//	@Success		200	{object}	map[string]string	"Acknowledgement"
-//	@Failure		500	{object}	string				"Internal error"
-func pushAccount(c echo.Context) error {
-	var pushCmd = lookupCommand(nsc.GetRootCmd(), "push")
-
-	form := postPushForm{}
-	err := setFlagsIfInJson(pushCmd, &form, c)
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	accCtx := storage.AccountServerMap{
-		Operator: form.Operator,
-		Account:  form.Account,
-		Server:   form.AccountJwtServerUrl,
-	}
-
-	if accCtx.Server == "" {
-		err := storage.FillAccCtxFromStorage(&accCtx)
-		if err != nil {
-			return badRequest(c, err)
-		}
-	}
-
-	err = pushCmd.Flags().Set("account-jwt-server-url", accCtx.Server)
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	err = pushCmd.RunE(pushCmd, []string{form.Account})
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	return c.JSON(200, &SimpleJSONResponse{
-		Status:  "200",
-		Message: "Account pushed",
 	})
 }

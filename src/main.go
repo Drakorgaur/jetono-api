@@ -24,6 +24,8 @@ func init() {
 
 	// TODO: create enum with options kubeful, kubeless, kubeintegrated.
 
+	// TOOD: nsc.tmplFull .replace("./jwt", $NATS_CONFIG_JWT_PATH)
+
 	if err := setUp(); err != nil {
 		_ = fmt.Errorf("init failed")
 	}
@@ -36,7 +38,10 @@ func init() {
 	}
 
 	store.KeyStorePath = os.Getenv("NKEYS_PATH")
-	config.StoreRoot = "/" + storeDir
+
+	cmd.GetConfig().StoreRoot = os.Getenv("NSC_STORE")
+	cmd.ConfigDirFlag = os.Getenv("NSC_HOME")
+	cmd.DataDirFlag = os.Getenv("NSC_STORE")
 
 	if _, err := os.Stat(config.StoreRoot); os.IsNotExist(err) {
 		fmt.Println("StoreRoot does not exist")
