@@ -12,4 +12,5 @@ func init() {
 	e.Use(resetCliMiddleware())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 }

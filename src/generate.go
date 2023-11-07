@@ -2,7 +2,6 @@ package src
 
 import (
 	"fmt"
-	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
@@ -11,7 +10,6 @@ import (
 
 func init() {
 	GetEchoRoot().GET("/generate/config", generateConfig)
-	GetEchoRoot().POST("/generate/config", storeConfig)
 }
 
 // GenerateConfig now supports only `--nats-resolver` configuration
@@ -110,47 +108,4 @@ func generateConfig(c echo.Context) error {
 type storeConfigForm struct {
 	Operator string `json:"operator"`
 	Name     string `json:"name"`
-}
-
-//	@Tags		Generate
-//	@Router		/generate/config [post]
-//	@Param		json	body	storeConfigForm	true	"json body"
-//	@Summary	Stores configuration for nats server with resolver as this operator in kubernetes secret
-//	@Success	200	{object}	SimpleJSONResponse	"200 ok"
-//	@Failure	500	{object}	string				"Internal error"
-func storeConfig(c echo.Context) error {
-	s := storeConfigForm{}
-	if err := c.Bind(&s); err != nil {
-		return err
-	}
-	if err := nsc.GetConfig().SetOperator(s.Operator); err != nil {
-		return badRequest(c, err)
-	}
-
-	storeT, err := storage.StoreType()
-	if err != nil {
-		return badRequest(c, err)
-	}
-
-	if kubeStore, ok := storeT.(*storage.KubernetesStore); ok {
-		config, err := GenerateConfig(s.Operator)
-		if err != nil {
-			return badRequest(c, err)
-		}
-		err = kubeStore.StoreSecret(
-			s.Name,
-			map[string][]byte{
-				".config": config,
-			},
-			kubeStore.ConfigNs,
-		)
-		if err != nil {
-			return badRequest(c, err)
-		}
-		return c.JSON(200, SimpleJSONResponse{
-			Status:  "200",
-			Message: "config stored",
-		})
-	}
-	return badRequest(c, fmt.Errorf("storage type %kubeStore does not support config storage", storeT))
 }
