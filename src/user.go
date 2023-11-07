@@ -2,6 +2,7 @@ package src
 
 import (
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"github.com/nats-io/jwt/v2"
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
