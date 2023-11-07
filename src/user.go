@@ -2,7 +2,6 @@ package src
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"github.com/nats-io/jwt/v2"
 	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
@@ -22,7 +21,7 @@ func init() {
 
 	root.DELETE("operator/:operator/account/:account/user/:name", revokeUser)
 
-	root.PATCH("operator/:operator/account/:account/user/:name", updateUser)
+	root.PUT("operator/:operator/account/:account/user/:name", updateUser)
 }
 
 type addUserForm struct {
@@ -30,16 +29,16 @@ type addUserForm struct {
 	Account string `json:"account"`
 }
 
-//	@Tags			User
-//	@Router			/operator/{operator}/account/{account}/user [post]
-//	@Summary		Add user
-//	@Description	Add user with given operator and account to the store
-//	@Param			json		body		addUserForm			true	"json"
-//	@Param			account		path		string				true	"Account name"
-//	@Param			operator	path		string				true	"Operator name"
-//	@Success		200			{object}	SimpleJSONResponse	"User added"
-//	@Failure		400			{object}	SimpleJSONResponse	"Bad request"
-//	@Failure		500			{object}	string				"Internal error"
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/user [post]
+// @Summary		Add user
+// @Description	Add user with given operator and account to the store
+// @Param			json		body		addUserForm			true	"json"
+// @Param			account		path		string				true	"Account name"
+// @Param			operator	path		string				true	"Operator name"
+// @Success		200			{object}	SimpleJSONResponse	"User added"
+// @Failure		400			{object}	SimpleJSONResponse	"Bad request"
+// @Failure		500			{object}	string				"Internal error"
 func addUser(c echo.Context) error {
 	cmd := nsc.CreateAddUserCmd()
 	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
@@ -69,14 +68,14 @@ func addUser(c echo.Context) error {
 	})
 }
 
-//	@Tags			User
-//	@Router			/operator/{operator}/account/{account}/users [get]
-//	@Summary		List users
-//	@Param			account		path	string	true	"Account name"
-//	@Param			operator	path	string	true	"Operator name"
-//	@Description	Returns json list of existing users for given operator's account
-//	@Success		200	{object}	[]string	"List of users for given operator's account"
-//	@Failure		500	{object}	string		"Internal error"
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/users [get]
+// @Summary		List users
+// @Param			account		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Description	Returns json list of existing users for given operator's account
+// @Success		200	{object}	[]string	"List of users for given operator's account"
+// @Failure		500	{object}	string		"Internal error"
 func listUsers(c echo.Context) error {
 	nsc.GetConfig().Operator = c.Param("operator")
 	nsc.GetConfig().Account = c.Param("account")
@@ -109,15 +108,15 @@ func listUsers(c echo.Context) error {
 	return c.JSON(200, map[string][]string{"users": users})
 }
 
-//	@Tags			User
-//	@Router			/operator/{operator}/account/{account}/user/{name} [get]
-//	@Param			name		path	string	true	"Username"
-//	@Param			account		path	string	true	"Account name"
-//	@Param			operator	path	string	true	"Operator name"
-//	@Summary		Describes user
-//	@Description	Returns json object with user description
-//	@Success		200	{object}	UserDescription	"Operator description"
-//	@Failure		500	{object}	string			"Internal error"
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/user/{name} [get]
+// @Param			name		path	string	true	"Username"
+// @Param			account		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Summary		Describes user
+// @Description	Returns json object with user description
+// @Success		200	{object}	UserDescription	"Operator description"
+// @Failure		500	{object}	string			"Internal error"
 func describeUser(c echo.Context) error {
 	s, err := nsc.GetStoreForOperator(c.Param("operator"))
 	if err != nil {
@@ -166,16 +165,16 @@ func GetUserCreds(operator string, account string, user string) ([]byte, error) 
 	return d, nil
 }
 
-//	@Tags		User
-//	@Router		/creds/operator/{operator}/account/{account}/user/{user} [get]
-//	@Summary	Generate user credentials
-//	@Param		user		path	string	true	"Username"
-//	@Param		account		path	string	true	"Account name"
-//	@Param		operator	path	string	true	"Operator name"
-//	@Description
-//	@Success	200	{object}	map[string]string	"Operators list"
-//	@Success	404	{object}	map[string]string	"User was not found"
-//	@Failure	500	{object}	string				"Internal error"
+// @Tags		User
+// @Router		/creds/operator/{operator}/account/{account}/user/{user} [get]
+// @Summary	Generate user credentials
+// @Param		user		path	string	true	"Username"
+// @Param		account		path	string	true	"Account name"
+// @Param		operator	path	string	true	"Operator name"
+// @Description
+// @Success	200	{object}	map[string]string	"Operators list"
+// @Success	404	{object}	map[string]string	"User was not found"
+// @Failure	500	{object}	string				"Internal error"
 func generateUser(c echo.Context) error {
 	d, err := GetUserCreds(c.Param("operator"), c.Param("account"), c.Param("user"))
 	if err != nil {
@@ -185,15 +184,15 @@ func generateUser(c echo.Context) error {
 	return c.JSON(200, map[string]string{"creds": string(d)})
 }
 
-//	@Tags			User
-//	@Router			/operator/{operator}/account/{account}/user/{name} [delete]
-//	@Param			name		path	string	true	"Username"
-//	@Param			account		path	string	true	"Account name"
-//	@Param			operator	path	string	true	"Operator name"
-//	@Summary		Revokes a user
-//	@Description	Revokes a user
-//	@Success		200	{object}	map[string]string	"Operator description"
-//	@Failure		500	{object}	string				"Internal error"
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/user/{name} [delete]
+// @Param			name		path	string	true	"Username"
+// @Param			account		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Summary		Revokes a user
+// @Description	Revokes a user
+// @Success		200	{object}	map[string]string	"Operator description"
+// @Failure		500	{object}	string				"Internal error"
 func revokeUser(c echo.Context) error {
 	var revokeCmd = lookupCommand(nsc.GetRootCmd(), "revocations")
 	var operatorCmd = lookupCommand(revokeCmd, "add-user")
@@ -243,16 +242,16 @@ type updateUserForm struct {
 	Rm               string `json:"rm,omitempty"`
 }
 
-//	@Tags			User
-//	@Router			/operator/{operator}/account/{account}/user/{name} [patch]
-//	@Param			name		path	string			true	"Username"
-//	@Param			account		path	string			true	"Account name"
-//	@Param			operator	path	string			true	"Operator name"
-//	@Param			json		body	updateUserForm	true	"add tags for user - comma separated list or option can be specified multiple times"
-//	@Summary		Updates an user
-//	@Description	Updates an user and returns json with status ok if successful
-//	@Success		200	{object}	SimpleJSONResponse	"Status ok"
-//	@Failure		500	{object}	string				"Internal error"
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/user/{name} [patch]
+// @Param			name		path	string			true	"Username"
+// @Param			account		path	string			true	"Account name"
+// @Param			operator	path	string			true	"Operator name"
+// @Param			json		body	updateUserForm	true	"add tags for user - comma separated list or option can be specified multiple times"
+// @Summary		Updates an user
+// @Description	Updates an user and returns json with status ok if successful
+// @Success		200	{object}	SimpleJSONResponse	"Status ok"
+// @Failure		500	{object}	string				"Internal error"
 func updateUser(c echo.Context) error {
 	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
 	var updateUserCmd = lookupCommand(updateCmd, "user")

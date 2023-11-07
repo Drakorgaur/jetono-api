@@ -1,7 +1,6 @@
 package src
 
 import (
-	"github.com/labstack/echo/v4"
 	nsc "github.com/nats-io/nsc/cmd"
 )
 
@@ -13,7 +12,7 @@ func init() {
 
 	root.GET("operator/:operator/account/:name", describeAccount)
 
-	root.PATCH("operator/:operator/account/:name", updateAccount)
+	root.PUT("operator/:operator/account/:name", updateAccount)
 }
 
 type addAccountForm struct {
@@ -31,15 +30,15 @@ type addAccountForm struct {
 	Expiry           string `json:"expiry,omitempty"`
 }
 
-//	@Tags			Account
-//	@Router			/operator/{operator}/account [post]
-//	@Summary		Add an account
-//	@Description	Add an account with given operator to the store
-//	@Param			operator	path		string				true	"Operator name"
-//	@Param			json		body		addAccountForm		true	"Account data in json format"
-//	@Success		200			{object}	SimpleJSONResponse	"Account added"
-//	@Failure		400			{object}	SimpleJSONResponse	"Bad request"
-//	@Failure		500			{object}	string				"Internal error"
+// @Tags			Account
+// @Router			/operator/{operator}/account [post]
+// @Summary		Add an account
+// @Description	Add an account with given operator to the store
+// @Param			operator	path		string				true	"Operator name"
+// @Param			json		body		addAccountForm		true	"Account data in json format"
+// @Success		200			{object}	SimpleJSONResponse	"Account added"
+// @Failure		400			{object}	SimpleJSONResponse	"Bad request"
+// @Failure		500			{object}	string				"Internal error"
 func addAccount(c echo.Context) error {
 	var addAccountCmd = nsc.CreateAddAccountCmd()
 
@@ -63,13 +62,13 @@ func addAccount(c echo.Context) error {
 	})
 }
 
-//	@Tags			Account
-//	@Router			/operator/{operator}/accounts [get]
-//	@Summary		List accounts
-//	@Param			operator	path	string	true	"Operator name"
-//	@Description	Returns json list of existing accounts for given operator
-//	@Success		200	{object}	[]string	"Operator's accounts list"
-//	@Failure		500	{object}	string		"Internal error"
+// @Tags			Account
+// @Router			/operator/{operator}/accounts [get]
+// @Summary		List accounts
+// @Param			operator	path	string	true	"Operator name"
+// @Description	Returns json list of existing accounts for given operator
+// @Success		200	{object}	[]string	"Operator's accounts list"
+// @Failure		500	{object}	string		"Internal error"
 func listAccounts(c echo.Context) error {
 	config := nsc.GetConfig()
 
@@ -88,14 +87,14 @@ func listAccounts(c echo.Context) error {
 	}
 }
 
-//	@Tags			Account
-//	@Router			/operator/{operator}/account/{name} [get]
-//	@Param			name		path	string	true	"Account name"
-//	@Param			operator	path	string	true	"Operator name"
-//	@Summary		Describes an account
-//	@Description	Returns json object with account description
-//	@Success		200	{object}	AccountDescription	"Operator description"
-//	@Failure		500	{object}	string				"Internal error"
+// @Tags			Account
+// @Router			/operator/{operator}/account/{name} [get]
+// @Param			name		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Summary		Describes an account
+// @Description	Returns json object with account description
+// @Success		200	{object}	AccountDescription	"Operator description"
+// @Failure		500	{object}	string				"Internal error"
 func describeAccount(c echo.Context) error {
 	store, err := nsc.GetStoreForOperator(c.Param("operator"))
 	if err != nil {
@@ -142,15 +141,15 @@ type updateAccountForm struct {
 	JsMaxAckPending    string `json:"js_max_ack_pending,omitempty"`
 }
 
-//	@Tags			Account
-//	@Router			/operator/{operator}/account/{name} [patch]
-//	@Param			name		path	string				true	"Account name"
-//	@Param			operator	path	string				true	"Operator name"
-//	@Param			json		body	updateAccountForm	true	"Account data in json format"
-//	@Summary		Updates an account
-//	@Description	Updates an account and returns json with status ok if successful
-//	@Success		200	{object}	SimpleJSONResponse	"Status ok"
-//	@Failure		500	{object}	string				"Internal error"
+// @Tags			Account
+// @Router			/operator/{operator}/account/{name} [patch]
+// @Param			name		path	string				true	"Account name"
+// @Param			operator	path	string				true	"Operator name"
+// @Param			json		body	updateAccountForm	true	"Account data in json format"
+// @Summary		Updates an account
+// @Description	Updates an account and returns json with status ok if successful
+// @Success		200	{object}	SimpleJSONResponse	"Status ok"
+// @Failure		500	{object}	string				"Internal error"
 func updateAccount(c echo.Context) error {
 	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
 	var updateAccountCmd = lookupCommand(updateCmd, "account")
