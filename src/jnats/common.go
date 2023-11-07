@@ -2,14 +2,15 @@ package jnats
 
 import (
 	"fmt"
-	"github.com/Drakorgaur/jetono-api/src/storage"
 	"github.com/nats-io/nats.go"
 	"os"
 	"path/filepath"
 )
 
 type UserNatsConn struct {
-	*storage.AccountServerMap
+	Operator string
+	Account  string
+	Server   string
 	*nats.Conn
 	User  string
 	creds []byte
