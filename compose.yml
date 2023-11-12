@@ -21,5 +21,8 @@ services:
     image: nats
     ports:
       - "4222:4222"
-      - "6222:6222"
+      - "9000:9000"
       - "8222:8222"
+    volumes:
+        - ./docker/nats-server.conf:/etc/nats/nats-server.conf
+    command: ["--config", "/etc/nats/nats-server.conf"]
