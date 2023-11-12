@@ -137,6 +137,18 @@ definitions:
       start:
         type: string
     type: object
+  src.addDataFlowForm:
+    properties:
+      created:
+        type: string
+      name:
+        type: string
+      server:
+        type: string
+    required:
+    - name
+    - server
+    type: object
   src.addOperatorForm:
     properties:
       expiry:
@@ -325,6 +337,74 @@ paths:
       summary: Generate user credentials
       tags:
       - User
+  /dataflow:
+    post:
+      description: Add a dataflow to the store
+      parameters:
+      - description: request body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.addDataFlowForm'
+      responses:
+        "200":
+          description: DataFlow added
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add a dataflow
+      tags:
+      - DataFlow
+  /dataflow/{id}:
+    delete:
+      description: Delete a dataflow from the store
+      parameters:
+      - description: DataFlow ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: DataFlow deleted
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Delete a dataflow
+      tags:
+      - DataFlow
+  /dataflows:
+    get:
+      description: Returns json list of existing dataflows
+      responses:
+        "200":
+          description: DataFlows list
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List dataflows
+      tags:
+      - DataFlow
   /generate/config:
     get:
       parameters:

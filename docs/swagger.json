@@ -61,6 +61,110 @@
                 }
             }
         },
+        "/dataflow": {
+            "post": {
+                "description": "Add a dataflow to the store",
+                "tags": [
+                    "DataFlow"
+                ],
+                "summary": "Add a dataflow",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.addDataFlowForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "DataFlow added",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/dataflow/{id}": {
+            "delete": {
+                "description": "Delete a dataflow from the store",
+                "tags": [
+                    "DataFlow"
+                ],
+                "summary": "Delete a dataflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DataFlow ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "DataFlow deleted",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/dataflows": {
+            "get": {
+                "description": "Returns json list of existing dataflows",
+                "tags": [
+                    "DataFlow"
+                ],
+                "summary": "List dataflows",
+                "responses": {
+                    "200": {
+                        "description": "DataFlows list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/generate/config": {
             "get": {
                 "tags": [
@@ -846,6 +950,24 @@
                     "type": "string"
                 },
                 "start": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.addDataFlowForm": {
+            "type": "object",
+            "required": [
+                "name",
+                "server"
+            ],
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "server": {
                     "type": "string"
                 }
             }
