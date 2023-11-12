@@ -6,7 +6,7 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/nats-io/jwt/v2 v2.5.0
-	github.com/nats-io/nats.go v1.28.0
+	github.com/nats-io/nats.go v1.31.0
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -36,7 +36,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.16.5 // indirect
+	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -48,7 +48,7 @@ require (
 	github.com/nats-io/cliprompts/v2 v2.0.0-20191226174129-372d79b36768 // indirect
 	github.com/nats-io/jsm.go v0.0.33 // indirect
 	github.com/nats-io/jwt v1.2.3-0.20210314221642-a826c77dc9d2 // indirect
-	github.com/nats-io/nkeys v0.4.4 // indirect
+	github.com/nats-io/nkeys v0.4.5 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/onsi/gomega v1.27.4 // indirect
 	github.com/rhysd/go-github-selfupdate v1.2.2 // indirect
