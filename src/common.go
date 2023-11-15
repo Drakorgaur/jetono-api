@@ -11,6 +11,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/stoewer/go-strcase"
+	"os"
+	"os/exec"
+	"reflect"
 )
 
 func initInfo(value string) {
@@ -23,6 +26,46 @@ func badRequest(c echo.Context, err error) error {
 		Status:  "400",
 		Message: err.Error(),
 	})
+}
+
+func addStoreConfig() []string {
+	return []string{
+		"--config-dir", os.Getenv("NSC_HOME"),
+		"--data-dir", os.Getenv("NSC_STORE"),
+		"--keystore-dir", os.Getenv("NKEYS_PATH"),
+	}
+}
+
+func runNsc(s interface{}, ctx echo.Context, args ...string) error {
+	if err := ctx.Bind(&s); err != nil {
+		return err
+	}
+	m := structs.Map(s)
+	fmt.Println(m)
+
+	for flag, value := range m {
+		fmt.Printf("flag: %s, value (%s): %s\n", flag, reflect.TypeOf(value), value)
+		if value == nil || value == "" || value == false {
+			continue
+		}
+		args = append(args, "--"+strcase.KebabCase(flag))
+		if val, ok := value.(string); ok {
+			args = append(args, val)
+		}
+	}
+
+	args = append(args, addStoreConfig()...)
+
+	fmt.Println("nsc", args)
+
+	var stderr bytes.Buffer
+	cmd := exec.Command("nsc", args...)
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("nsc error[%s]: %s", err, stderr.String())
+	}
+
+	return nil
 }
 
 // copied from source. (nsc)
@@ -49,20 +92,6 @@ func bodyAsJson(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("error formatting json: %v", err)
 	}
 	return j.Bytes(), nil
-}
-
-func setFlagsIfInForm(cmd *cobra.Command, getFlag func(string) string, flags []string) error {
-	for _, flag := range flags {
-		value := getFlag(flag)
-		f := cmd.Flag(flag)
-		f.Changed = true
-		if val, ok := f.Value.(pflag.SliceValue); ok {
-			_ = val.Replace([]string{value})
-		} else {
-			_ = f.Value.Set(value)
-		}
-	}
-	return nil
 }
 
 func setFlagsIfInJson(cmd *cobra.Command, s interface{}, ctx echo.Context) error {
