@@ -73,11 +73,13 @@ func listOperators(c echo.Context) error {
 // @Success		200	{object}	OperatorDescription	"Operator description"
 // @Failure		500	{object}	string				"Internal error"
 func describeOperator(c echo.Context) error {
-	s, err := nsc.GetStoreForOperator(c.Param("name"))
+	operator := c.Param("name")
+	s, err := nsc.GetStoreForOperator(operator)
 	if err != nil {
 		return badRequest(c, err)
 	}
 
+	s.Info.Name = operator
 	claim, err := s.ReadRawOperatorClaim()
 	if err != nil {
 		return badRequest(c, err)
