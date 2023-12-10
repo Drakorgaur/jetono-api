@@ -37,20 +37,22 @@ func addStoreConfig() []string {
 }
 
 func runNsc(s interface{}, ctx echo.Context, args ...string) error {
-	if err := ctx.Bind(&s); err != nil {
-		return err
-	}
-	m := structs.Map(s)
-	fmt.Println(m)
-
-	for flag, value := range m {
-		fmt.Printf("flag: %s, value (%s): %s\n", flag, reflect.TypeOf(value), value)
-		if value == nil || value == "" || value == false {
-			continue
+	if s != nil || ctx != nil {
+		if err := ctx.Bind(&s); err != nil {
+			return err
 		}
-		args = append(args, "--"+strcase.KebabCase(flag))
-		if val, ok := value.(string); ok {
-			args = append(args, val)
+		m := structs.Map(s)
+		fmt.Println(m)
+
+		for flag, value := range m {
+			fmt.Printf("flag: %s, value (%s): %s\n", flag, reflect.TypeOf(value), value)
+			if value == nil || value == "" || value == false {
+				continue
+			}
+			args = append(args, "--"+strcase.KebabCase(flag))
+			if val, ok := value.(string); ok {
+				args = append(args, val)
+			}
 		}
 	}
 

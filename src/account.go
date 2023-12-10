@@ -13,7 +13,7 @@ func init() {
 
 	root.GET("operator/:operator/account/:name", describeAccount)
 
-	root.PUT("operator/:operator/account/:name", updateAccount)
+	root.PATCH("operator/:operator/account/:name", updateAccount)
 }
 
 type addAccountForm struct {
@@ -41,19 +41,16 @@ type addAccountForm struct {
 // @Failure		400			{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500			{object}	string				"Internal error"
 func addAccount(c echo.Context) error {
-	var addAccountCmd = nsc.CreateAddAccountCmd()
 
-	a := addAccountForm{}
-	err := setFlagsIfInJson(addAccountCmd, &a, c)
+	err := runNsc(nil, nil, "select", "operator", c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
-		return badRequest(c, err)
-	}
+	a := addAccountForm{}
 
-	if err := addAccountCmd.RunE(addAccountCmd, []string{a.Name}); err != nil {
+	err = runNsc(&a, c, "add", "account")
+	if err != nil {
 		return badRequest(c, err)
 	}
 
@@ -152,20 +149,15 @@ type updateAccountForm struct {
 // @Success		200	{object}	SimpleJSONResponse	"Status ok"
 // @Failure		500	{object}	string				"Internal error"
 func updateAccount(c echo.Context) error {
-	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
-	var updateAccountCmd = lookupCommand(updateCmd, "account")
+	s := &updateAccountForm{}
 
-	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
-		return badRequest(c, err)
-	}
-
-	err := setFlagsIfInJson(updateAccountCmd, &updateAccountForm{}, c)
-
+	err := runNsc(nil, nil, "select", "operator", c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	if err := updateAccountCmd.RunE(updateAccountCmd, []string{c.Param("name")}); err != nil {
+	err = runNsc(s, c, "edit", "account", c.Param("name"), "--operator", c.Param("operator"))
+	if err != nil {
 		return badRequest(c, err)
 	}
 

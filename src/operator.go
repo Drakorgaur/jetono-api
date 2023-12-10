@@ -14,7 +14,7 @@ func init() {
 
 	GetEchoRoot().GET("operator/:name", describeOperator)
 
-	GetEchoRoot().PUT("operator/:name", updateOperator)
+	GetEchoRoot().PATCH("operator/:name", updateOperator)
 }
 
 type addOperatorForm struct {
@@ -111,19 +111,15 @@ type updateOperatorForm struct {
 // @Success		200	{object}	SimpleJSONResponse	"Status ok"
 // @Failure		500	{object}	string				"Internal error"
 func updateOperator(c echo.Context) error {
-	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
-	var updateOperatorCmd = lookupCommand(updateCmd, "operator")
+	s := &updateOperatorForm{}
 
-	if err := nsc.GetConfig().SetOperator(c.Param("name")); err != nil {
-		return badRequest(c, err)
-	}
-
-	err := setFlagsIfInJson(updateOperatorCmd, &updateOperatorForm{}, c)
+	err := runNsc(nil, nil, "select", "operator", c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	if err := updateOperatorCmd.RunE(updateOperatorCmd, []string{c.Param("name")}); err != nil {
+	err = runNsc(s, c, "edit", "operator")
+	if err != nil {
 		return badRequest(c, err)
 	}
 

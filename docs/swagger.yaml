@@ -51,6 +51,67 @@ definitions:
       sub:
         type: string
     type: object
+  src.Dashboard:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/src.DbAccount'
+        type: array
+      dataflows:
+        items:
+          $ref: '#/definitions/src.DbDataflow'
+        type: array
+      operators:
+        items:
+          $ref: '#/definitions/src.DbOperator'
+        type: array
+      users:
+        items:
+          $ref: '#/definitions/src.DbUser'
+        type: array
+    type: object
+  src.DbAccount:
+    properties:
+      name:
+        type: string
+      operator:
+        type: string
+    required:
+    - name
+    - operator
+    type: object
+  src.DbDataflow:
+    properties:
+      created:
+        type: string
+      name:
+        type: string
+      server:
+        type: string
+    required:
+    - name
+    - server
+    type: object
+  src.DbOperator:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  src.DbUser:
+    properties:
+      account:
+        type: string
+      name:
+        type: string
+      operator:
+        type: string
+    required:
+    - account
+    - name
+    - operator
+    type: object
   src.OperatorDescription:
     properties:
       iat:
@@ -337,6 +398,50 @@ paths:
       summary: Generate user credentials
       tags:
       - User
+  /dashboard:
+    get:
+      description: Get the dashboard
+      responses:
+        "200":
+          description: Get the dashboard
+          schema:
+            $ref: '#/definitions/src.Dashboard'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get the dashboard
+      tags:
+      - Dashboard
+    put:
+      description: Create a new dashboard or put a new one
+      parameters:
+      - description: Dashboard data in json format
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.Dashboard'
+      responses:
+        "200":
+          description: Dashboard updated
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Create a new dashboard or put a new one
+      tags:
+      - Dashboard
   /dataflow:
     post:
       description: Add a dataflow to the store

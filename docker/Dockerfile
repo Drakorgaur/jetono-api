@@ -2,12 +2,14 @@ FROM golang as builder
 LABEL authors="pomo"
 
 WORKDIR /jetono-api/src
+RUN go install github.com/nats-io/nsc/v2@latest
 
-COPY . .
 RUN mkdir -p /jetono-api/bin
 COPY ./go.mod ./go.sum /
 
 RUN go mod download
+
+COPY . .
 
 RUN --mount=type=cache,mode=0777,target=/root/.cache/go-build go build -o /jetono-api/bin/jetono-api
 

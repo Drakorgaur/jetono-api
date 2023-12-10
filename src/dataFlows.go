@@ -56,13 +56,13 @@ func readDataFlows() ([]addDataFlowForm, error) {
 	return dataFlows, err
 }
 
-func storeDataFlows(dataFlows []addDataFlowForm) error {
+func storeJson(filename string, dataFlows interface{}) error {
 	jsonData, err := json.Marshal(dataFlows)
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(fileName, jsonData, 0644)
+	return os.WriteFile(filename, jsonData, 0644)
 }
 
 // @Tags			DataFlow
@@ -89,7 +89,7 @@ func addDataFlow(c echo.Context) error {
 
 	dataFlows = append(dataFlows, dataFlow)
 
-	err = storeDataFlows(dataFlows)
+	err = storeJson(fileName, dataFlows)
 	if err != nil {
 		return badRequest(c, err)
 	}
@@ -142,7 +142,7 @@ func deleteDataFlow(c echo.Context) error {
 		}
 	}
 
-	err = storeDataFlows(newDataFlows)
+	err = storeJson(fileName, newDataFlows)
 	if err != nil {
 		return badRequest(c, err)
 	}
