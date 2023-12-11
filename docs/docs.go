@@ -154,7 +154,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/src.addDataFlowForm"
+                            "$ref": "#/definitions/src.DataFlow"
                         }
                     }
                 ],
@@ -199,6 +199,51 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "DataFlow deleted",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Patch a dataflow from the store",
+                "tags": [
+                    "DataFlow"
+                ],
+                "summary": "Patch a dataflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DataFlow ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.DataFlow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "DataFlow updated",
                         "schema": {
                             "$ref": "#/definitions/src.SimpleJSONResponse"
                         }
@@ -931,6 +976,30 @@ const docTemplate = `{
                 }
             }
         },
+        "src.DataFlow": {
+            "type": "object",
+            "required": [
+                "name",
+                "server"
+            ],
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lon": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "server": {
+                    "type": "string"
+                }
+            }
+        },
         "src.DbAccount": {
             "type": "object",
             "required": [
@@ -1121,24 +1190,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "start": {
-                    "type": "string"
-                }
-            }
-        },
-        "src.addDataFlowForm": {
-            "type": "object",
-            "required": [
-                "name",
-                "server"
-            ],
-            "properties": {
-                "created": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "server": {
                     "type": "string"
                 }
             }

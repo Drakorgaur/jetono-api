@@ -70,6 +70,22 @@ definitions:
           $ref: '#/definitions/src.DbUser'
         type: array
     type: object
+  src.DataFlow:
+    properties:
+      created:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      name:
+        type: string
+      server:
+        type: string
+    required:
+    - name
+    - server
+    type: object
   src.DbAccount:
     properties:
       name:
@@ -197,18 +213,6 @@ definitions:
         type: string
       start:
         type: string
-    type: object
-  src.addDataFlowForm:
-    properties:
-      created:
-        type: string
-      name:
-        type: string
-      server:
-        type: string
-    required:
-    - name
-    - server
     type: object
   src.addOperatorForm:
     properties:
@@ -451,7 +455,7 @@ paths:
         name: json
         required: true
         schema:
-          $ref: '#/definitions/src.addDataFlowForm'
+          $ref: '#/definitions/src.DataFlow'
       responses:
         "200":
           description: DataFlow added
@@ -491,6 +495,36 @@ paths:
           schema:
             type: string
       summary: Delete a dataflow
+      tags:
+      - DataFlow
+    patch:
+      description: Patch a dataflow from the store
+      parameters:
+      - description: DataFlow ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: request body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.DataFlow'
+      responses:
+        "200":
+          description: DataFlow updated
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Patch a dataflow
       tags:
       - DataFlow
   /dataflows:

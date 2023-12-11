@@ -2,6 +2,7 @@ package src
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"os"
 	"time"
@@ -15,12 +16,16 @@ func init() {
 	GetEchoRoot().POST("dataflows", addDataFlow)
 
 	GetEchoRoot().DELETE("dataflow/:id", deleteDataFlow)
+
+	GetEchoRoot().PATCH("dataflow/:id", patchDataFlow)
 }
 
-type addDataFlowForm struct {
-	Name    string `json:"name" validate:"required"`
-	Server  string `json:"server" validate:"required"`
-	Created string `json:"created,omitempty"`
+type DataFlow struct {
+	Name    string  `json:"name" validate:"required"`
+	Server  string  `json:"server" validate:"required"`
+	Created string  `json:"created,omitempty"`
+	Lat     float64 `json:"lat,omitempty"`
+	Lon     float64 `json:"lon,omitempty"`
 }
 
 func readJsonFile(fileName string, obj interface{}) error {
@@ -50,8 +55,8 @@ func readJsonFile(fileName string, obj interface{}) error {
 	return json.Unmarshal(bytedJson, obj)
 }
 
-func readDataFlows() ([]addDataFlowForm, error) {
-	var dataFlows []addDataFlowForm
+func readDataFlows() ([]DataFlow, error) {
+	var dataFlows []DataFlow
 	err := readJsonFile(fileName, &dataFlows)
 	return dataFlows, err
 }
@@ -69,12 +74,12 @@ func storeJson(filename string, dataFlows interface{}) error {
 // @Router			/dataflow [post]
 // @Summary		Add a dataflow
 // @Description	Add a dataflow to the store
-// @Param			json	body		addDataFlowForm		true	"request body"
+// @Param			json	body		DataFlow		true	"request body"
 // @Success		200		{object}	SimpleJSONResponse	"DataFlow added"
 // @Failure		400		{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500		{object}	string				"Internal error"
 func addDataFlow(c echo.Context) error {
-	var dataFlow addDataFlowForm
+	var dataFlow DataFlow
 	err := c.Bind(&dataFlow)
 	if err != nil {
 		return badRequest(c, err)
@@ -116,7 +121,7 @@ func listDataFlows(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	return c.JSON(200, map[string][]addDataFlowForm{"dataflows": dataFlows})
+	return c.JSON(200, map[string][]DataFlow{"dataflows": dataFlows})
 }
 
 // @Tags			DataFlow
@@ -135,7 +140,7 @@ func deleteDataFlow(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	var newDataFlows []addDataFlowForm
+	var newDataFlows []DataFlow
 	for _, dataFlow := range dataFlows {
 		if dataFlow.Name != id {
 			newDataFlows = append(newDataFlows, dataFlow)
@@ -150,5 +155,57 @@ func deleteDataFlow(c echo.Context) error {
 	return c.JSON(200, &SimpleJSONResponse{
 		Status:  "200",
 		Message: "DataFlow deleted",
+	})
+}
+
+// @Tags			DataFlow
+// @Router			/dataflow/{id} [patch]
+// @Summary		Patch a dataflow
+// @Description	Patch a dataflow from the store
+// @Param			id		path	string				true	"DataFlow ID"
+// @Param			json	body	DataFlow			true	"request body"
+// @Success		200		{object}	SimpleJSONResponse	"DataFlow updated"
+// @Failure		400		{object}	SimpleJSONResponse	"Bad request"
+// @Failure		500		{object}	string				"Internal error"
+func patchDataFlow(c echo.Context) error {
+	id := c.Param("id")
+
+	dataFlows, err := readDataFlows()
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	var newDataFlows []*DataFlow
+	var df *DataFlow
+	for _, dataFlow := range dataFlows {
+		if dataFlow.Name == id {
+			df = &dataFlow
+		} else {
+			newDataFlows = append(newDataFlows, &dataFlow)
+		}
+	}
+
+	if df == nil {
+		return c.JSON(404, &SimpleJSONResponse{
+			Status:  "404",
+			Message: fmt.Sprintf("DataFlow %s not found", id),
+		})
+	}
+
+	err = c.Bind(df)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	newDataFlows = append(newDataFlows, df)
+
+	err = storeJson(fileName, newDataFlows)
+	if err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200, &SimpleJSONResponse{
+		Status:  "200",
+		Message: "DataFlow updated",
 	})
 }
