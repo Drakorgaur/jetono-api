@@ -15,9 +15,9 @@ func init() {
 
 	GetEchoRoot().POST("dataflows", addDataFlow)
 
-	GetEchoRoot().DELETE("dataflow/:id", deleteDataFlow)
+	GetEchoRoot().DELETE("dataflows/:id", deleteDataFlow)
 
-	GetEchoRoot().PATCH("dataflow/:id", patchDataFlow)
+	GetEchoRoot().PATCH("dataflows/:id", patchDataFlow)
 }
 
 type DataFlow struct {
@@ -125,7 +125,7 @@ func listDataFlows(c echo.Context) error {
 }
 
 // @Tags			DataFlow
-// @Router			/dataflow/{id} [delete]
+// @Router			/dataflows/{id} [delete]
 // @Summary		Delete a dataflow
 // @Description	Delete a dataflow from the store
 // @Param			id	path	string				true	"DataFlow ID"
@@ -159,7 +159,7 @@ func deleteDataFlow(c echo.Context) error {
 }
 
 // @Tags			DataFlow
-// @Router			/dataflow/{id} [patch]
+// @Router			/dataflows/{id} [patch]
 // @Summary		Patch a dataflow
 // @Description	Patch a dataflow from the store
 // @Param			id		path	string				true	"DataFlow ID"

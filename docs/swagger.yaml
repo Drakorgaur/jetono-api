@@ -472,7 +472,24 @@ paths:
       summary: Add a dataflow
       tags:
       - DataFlow
-  /dataflow/{id}:
+  /dataflows:
+    get:
+      description: Returns json list of existing dataflows
+      responses:
+        "200":
+          description: DataFlows list
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List dataflows
+      tags:
+      - DataFlow
+  /dataflows/{id}:
     delete:
       description: Delete a dataflow from the store
       parameters:
@@ -525,23 +542,6 @@ paths:
           schema:
             type: string
       summary: Patch a dataflow
-      tags:
-      - DataFlow
-  /dataflows:
-    get:
-      description: Returns json list of existing dataflows
-      responses:
-        "200":
-          description: DataFlows list
-          schema:
-            items:
-              type: string
-            type: array
-        "500":
-          description: Internal error
-          schema:
-            type: string
-      summary: List dataflows
       tags:
       - DataFlow
   /generate/config:
