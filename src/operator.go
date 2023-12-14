@@ -14,7 +14,7 @@ func init() {
 
 	GetEchoRoot().GET("operator/:name", describeOperator)
 
-	GetEchoRoot().PUT("operator/:name", updateOperator)
+	GetEchoRoot().PATCH("operator/:name", updateOperator)
 }
 
 type addOperatorForm struct {
@@ -35,15 +35,10 @@ type addOperatorForm struct {
 // @Failure		400		{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500		{object}	string				"Internal error"
 func addOperator(c echo.Context) error {
-	var addCmd = lookupCommand(nsc.GetRootCmd(), "add")
-	var addOperatorCmd = lookupCommand(addCmd, "operator")
+	form := addOperatorForm{}
 
-	err := setFlagsIfInJson(addOperatorCmd, &addOperatorForm{}, c)
+	err := runNsc(&form, c, "add", "operator")
 	if err != nil {
-		return badRequest(c, err)
-	}
-
-	if err := addOperatorCmd.RunE(addOperatorCmd, []string{c.FormValue("name")}); err != nil {
 		return badRequest(c, err)
 	}
 
@@ -73,11 +68,13 @@ func listOperators(c echo.Context) error {
 // @Success		200	{object}	OperatorDescription	"Operator description"
 // @Failure		500	{object}	string				"Internal error"
 func describeOperator(c echo.Context) error {
-	s, err := nsc.GetStoreForOperator(c.Param("name"))
+	operator := c.Param("name")
+	s, err := nsc.GetStoreForOperator(operator)
 	if err != nil {
 		return badRequest(c, err)
 	}
 
+	s.Info.Name = operator
 	claim, err := s.ReadRawOperatorClaim()
 	if err != nil {
 		return badRequest(c, err)
@@ -114,19 +111,15 @@ type updateOperatorForm struct {
 // @Success		200	{object}	SimpleJSONResponse	"Status ok"
 // @Failure		500	{object}	string				"Internal error"
 func updateOperator(c echo.Context) error {
-	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
-	var updateOperatorCmd = lookupCommand(updateCmd, "operator")
+	s := &updateOperatorForm{}
 
-	if err := nsc.GetConfig().SetOperator(c.Param("name")); err != nil {
-		return badRequest(c, err)
-	}
-
-	err := setFlagsIfInJson(updateOperatorCmd, &updateOperatorForm{}, c)
+	err := runNsc(nil, nil, "select", "operator", c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	if err := updateOperatorCmd.RunE(updateOperatorCmd, []string{c.Param("name")}); err != nil {
+	err = runNsc(s, c, "edit", "operator")
+	if err != nil {
 		return badRequest(c, err)
 	}
 

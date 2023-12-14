@@ -73,6 +73,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard": {
+            "get": {
+                "description": "Get the dashboard",
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get the dashboard",
+                "responses": {
+                    "200": {
+                        "description": "Get the dashboard",
+                        "schema": {
+                            "$ref": "#/definitions/src.Dashboard"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Create a new dashboard or put a new one",
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Create a new dashboard or put a new one",
+                "parameters": [
+                    {
+                        "description": "Dashboard data in json format",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.Dashboard"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dashboard updated",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/dataflow": {
             "post": {
                 "description": "Add a dataflow to the store",
@@ -87,7 +154,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/src.addDataFlowForm"
+                            "$ref": "#/definitions/src.DataFlow"
                         }
                     }
                 ],
@@ -113,7 +180,33 @@ const docTemplate = `{
                 }
             }
         },
-        "/dataflow/{id}": {
+        "/dataflows": {
+            "get": {
+                "description": "Returns json list of existing dataflows",
+                "tags": [
+                    "DataFlow"
+                ],
+                "summary": "List dataflows",
+                "responses": {
+                    "200": {
+                        "description": "DataFlows list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/dataflows/{id}": {
             "delete": {
                 "description": "Delete a dataflow from the store",
                 "tags": [
@@ -149,23 +242,42 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/dataflows": {
-            "get": {
-                "description": "Returns json list of existing dataflows",
+            },
+            "patch": {
+                "description": "Patch a dataflow from the store",
                 "tags": [
                     "DataFlow"
                 ],
-                "summary": "List dataflows",
+                "summary": "Patch a dataflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DataFlow ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/src.DataFlow"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "DataFlows list",
+                        "description": "DataFlow updated",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/src.SimpleJSONResponse"
                         }
                     },
                     "500": {
@@ -835,6 +947,122 @@ const docTemplate = `{
                 }
             }
         },
+        "src.Dashboard": {
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/src.DbAccount"
+                    }
+                },
+                "dataflows": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/src.DbDataflow"
+                    }
+                },
+                "operators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/src.DbOperator"
+                    }
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/src.DbUser"
+                    }
+                }
+            }
+        },
+        "src.DataFlow": {
+            "type": "object",
+            "required": [
+                "name",
+                "server"
+            ],
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lon": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "server": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.DbAccount": {
+            "type": "object",
+            "required": [
+                "name",
+                "operator"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.DbDataflow": {
+            "type": "object",
+            "required": [
+                "name",
+                "server"
+            ],
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "server": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.DbOperator": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "src.DbUser": {
+            "type": "object",
+            "required": [
+                "account",
+                "name",
+                "operator"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string"
+                }
+            }
+        },
         "src.OperatorDescription": {
             "type": "object",
             "properties": {
@@ -962,24 +1190,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "start": {
-                    "type": "string"
-                }
-            }
-        },
-        "src.addDataFlowForm": {
-            "type": "object",
-            "required": [
-                "name",
-                "server"
-            ],
-            "properties": {
-                "created": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "server": {
                     "type": "string"
                 }
             }

@@ -51,6 +51,83 @@ definitions:
       sub:
         type: string
     type: object
+  src.Dashboard:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/src.DbAccount'
+        type: array
+      dataflows:
+        items:
+          $ref: '#/definitions/src.DbDataflow'
+        type: array
+      operators:
+        items:
+          $ref: '#/definitions/src.DbOperator'
+        type: array
+      users:
+        items:
+          $ref: '#/definitions/src.DbUser'
+        type: array
+    type: object
+  src.DataFlow:
+    properties:
+      created:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      name:
+        type: string
+      server:
+        type: string
+    required:
+    - name
+    - server
+    type: object
+  src.DbAccount:
+    properties:
+      name:
+        type: string
+      operator:
+        type: string
+    required:
+    - name
+    - operator
+    type: object
+  src.DbDataflow:
+    properties:
+      created:
+        type: string
+      name:
+        type: string
+      server:
+        type: string
+    required:
+    - name
+    - server
+    type: object
+  src.DbOperator:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  src.DbUser:
+    properties:
+      account:
+        type: string
+      name:
+        type: string
+      operator:
+        type: string
+    required:
+    - account
+    - name
+    - operator
+    type: object
   src.OperatorDescription:
     properties:
       iat:
@@ -136,18 +213,6 @@ definitions:
         type: string
       start:
         type: string
-    type: object
-  src.addDataFlowForm:
-    properties:
-      created:
-        type: string
-      name:
-        type: string
-      server:
-        type: string
-    required:
-    - name
-    - server
     type: object
   src.addOperatorForm:
     properties:
@@ -337,6 +402,50 @@ paths:
       summary: Generate user credentials
       tags:
       - User
+  /dashboard:
+    get:
+      description: Get the dashboard
+      responses:
+        "200":
+          description: Get the dashboard
+          schema:
+            $ref: '#/definitions/src.Dashboard'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get the dashboard
+      tags:
+      - Dashboard
+    put:
+      description: Create a new dashboard or put a new one
+      parameters:
+      - description: Dashboard data in json format
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.Dashboard'
+      responses:
+        "200":
+          description: Dashboard updated
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Create a new dashboard or put a new one
+      tags:
+      - Dashboard
   /dataflow:
     post:
       description: Add a dataflow to the store
@@ -346,7 +455,7 @@ paths:
         name: json
         required: true
         schema:
-          $ref: '#/definitions/src.addDataFlowForm'
+          $ref: '#/definitions/src.DataFlow'
       responses:
         "200":
           description: DataFlow added
@@ -363,7 +472,24 @@ paths:
       summary: Add a dataflow
       tags:
       - DataFlow
-  /dataflow/{id}:
+  /dataflows:
+    get:
+      description: Returns json list of existing dataflows
+      responses:
+        "200":
+          description: DataFlows list
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List dataflows
+      tags:
+      - DataFlow
+  /dataflows/{id}:
     delete:
       description: Delete a dataflow from the store
       parameters:
@@ -388,21 +514,34 @@ paths:
       summary: Delete a dataflow
       tags:
       - DataFlow
-  /dataflows:
-    get:
-      description: Returns json list of existing dataflows
+    patch:
+      description: Patch a dataflow from the store
+      parameters:
+      - description: DataFlow ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: request body
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/src.DataFlow'
       responses:
         "200":
-          description: DataFlows list
+          description: DataFlow updated
           schema:
-            items:
-              type: string
-            type: array
+            $ref: '#/definitions/src.SimpleJSONResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/src.SimpleJSONResponse'
         "500":
           description: Internal error
           schema:
             type: string
-      summary: List dataflows
+      summary: Patch a dataflow
       tags:
       - DataFlow
   /generate/config:

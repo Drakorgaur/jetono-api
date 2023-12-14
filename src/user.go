@@ -22,7 +22,7 @@ func init() {
 
 	root.DELETE("operator/:operator/account/:account/user/:name", revokeUser)
 
-	root.PUT("operator/:operator/account/:account/user/:name", updateUser)
+	root.PATCH("operator/:operator/account/:account/user/:name", updateUser)
 }
 
 type addUserForm struct {
