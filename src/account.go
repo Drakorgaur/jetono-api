@@ -156,7 +156,7 @@ func updateAccount(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	err = runNsc(s, c, "edit", "account", c.Param("name"), "--operator", c.Param("operator"))
+	err = runNsc(s, c, "edit", "account", c.Param("name"))
 	if err != nil {
 		return badRequest(c, err)
 	}
