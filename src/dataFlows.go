@@ -85,6 +85,13 @@ func addDataFlow(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
+	if dataFlow.Name == "" || dataFlow.Server == "" {
+		return c.JSON(400, &SimpleJSONResponse{
+			Status:  "400",
+			Message: "Error: Name and Server are required",
+		})
+	}
+
 	dataFlow.Created = GetTimeNow()
 
 	dataFlows, err := readDataFlows()

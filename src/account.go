@@ -2,7 +2,7 @@ package src
 
 import (
 	"github.com/labstack/echo/v4"
-	nsc "github.com/nats-io/nsc/cmd"
+	nsc "github.com/nats-io/nsc/v2/cmd"
 )
 
 func init() {
@@ -156,7 +156,7 @@ func updateAccount(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	err = runNsc(s, c, "edit", "account", c.Param("name"), "--operator", c.Param("operator"))
+	err = runNsc(s, c, "edit", "account", c.Param("name"))
 	if err != nil {
 		return badRequest(c, err)
 	}

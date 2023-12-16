@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
+	"github.com/nats-io/nsc/v2/cmd"
 	"os"
 
 	"github.com/swaggo/echo-swagger"

@@ -2,7 +2,7 @@ package src
 
 import (
 	"github.com/labstack/echo/v4"
-	nsc "github.com/nats-io/nsc/cmd"
+	nsc "github.com/nats-io/nsc/v2/cmd"
 	"github.com/spf13/cobra"
 )
 

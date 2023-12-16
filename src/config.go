@@ -2,7 +2,7 @@ package src
 
 import (
 	"fmt"
-	nsc "github.com/nats-io/nsc/cmd"
+	nsc "github.com/nats-io/nsc/v2/cmd"
 	"os"
 )
 

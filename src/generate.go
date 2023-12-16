@@ -3,8 +3,8 @@ package src
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	nsc "github.com/nats-io/nsc/cmd"
 	"github.com/nats-io/nsc/cmd/store"
+	nsc "github.com/nats-io/nsc/v2/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -79,12 +79,12 @@ func GenerateConfig(operatorName string) ([]byte, error) {
 	return d, nil
 }
 
-//	@Tags		Generate
-//	@Router		/generate/config [get]
-//	@Param		operator	query	string	true	"Operator name"
-//	@Summary	Sends configuration for nats server with resolver as this operator
-//	@Success	200	{object}	string	"text/plain config file"
-//	@Failure	500	{object}	string	"Internal error"
+// @Tags		Generate
+// @Router		/generate/config [get]
+// @Param		operator	query	string	true	"Operator name"
+// @Summary	Sends configuration for nats server with resolver as this operator
+// @Success	200	{object}	string	"text/plain config file"
+// @Failure	500	{object}	string	"Internal error"
 func generateConfig(c echo.Context) error {
 
 	err, s := raiseForRequiredFlags(c.QueryParam, "operator")
