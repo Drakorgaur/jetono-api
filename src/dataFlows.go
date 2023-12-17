@@ -71,7 +71,7 @@ func storeJson(filename string, dataFlows interface{}) error {
 }
 
 // @Tags			DataFlow
-// @Router			/dataflow [post]
+// @Router			/dataflows [post]
 // @Summary		Add a dataflow
 // @Description	Add a dataflow to the store
 // @Param			json	body		DataFlow		true	"request body"
@@ -182,13 +182,13 @@ func patchDataFlow(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	var newDataFlows []*DataFlow
+	var newDataFlows []DataFlow
 	var df *DataFlow
 	for _, dataFlow := range dataFlows {
 		if dataFlow.Name == id {
 			df = &dataFlow
 		} else {
-			newDataFlows = append(newDataFlows, &dataFlow)
+			newDataFlows = append(newDataFlows, dataFlow)
 		}
 	}
 
@@ -204,7 +204,7 @@ func patchDataFlow(c echo.Context) error {
 		return badRequest(c, err)
 	}
 
-	newDataFlows = append(newDataFlows, df)
+	newDataFlows = append(newDataFlows, *df)
 
 	err = storeJson(fileName, newDataFlows)
 	if err != nil {

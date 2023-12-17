@@ -140,7 +140,31 @@ const docTemplate = `{
                 }
             }
         },
-        "/dataflow": {
+        "/dataflows": {
+            "get": {
+                "description": "Returns json list of existing dataflows",
+                "tags": [
+                    "DataFlow"
+                ],
+                "summary": "List dataflows",
+                "responses": {
+                    "200": {
+                        "description": "DataFlows list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Add a dataflow to the store",
                 "tags": [
@@ -169,32 +193,6 @@ const docTemplate = `{
                         "description": "Bad request",
                         "schema": {
                             "$ref": "#/definitions/src.SimpleJSONResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/dataflows": {
-            "get": {
-                "description": "Returns json list of existing dataflows",
-                "tags": [
-                    "DataFlow"
-                ],
-                "summary": "List dataflows",
-                "responses": {
-                    "200": {
-                        "description": "DataFlows list",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
                         }
                     },
                     "500": {

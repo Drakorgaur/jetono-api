@@ -446,7 +446,23 @@ paths:
       summary: Create a new dashboard or put a new one
       tags:
       - Dashboard
-  /dataflow:
+  /dataflows:
+    get:
+      description: Returns json list of existing dataflows
+      responses:
+        "200":
+          description: DataFlows list
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: List dataflows
+      tags:
+      - DataFlow
     post:
       description: Add a dataflow to the store
       parameters:
@@ -470,23 +486,6 @@ paths:
           schema:
             type: string
       summary: Add a dataflow
-      tags:
-      - DataFlow
-  /dataflows:
-    get:
-      description: Returns json list of existing dataflows
-      responses:
-        "200":
-          description: DataFlows list
-          schema:
-            items:
-              type: string
-            type: array
-        "500":
-          description: Internal error
-          schema:
-            type: string
-      summary: List dataflows
       tags:
       - DataFlow
   /dataflows/{id}:
