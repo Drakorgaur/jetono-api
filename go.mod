@@ -4,7 +4,8 @@ go 1.20
 
 require (
 	github.com/fatih/structs v1.1.0
-	github.com/labstack/echo/v4 v4.11.2
+	github.com/labstack/echo/v4 v4.11.3
+	github.com/nats-io/jwt/v2 v2.5.3
 	github.com/nats-io/nats.go v1.31.0
 	github.com/nats-io/nsc v0.0.0-20221206222106-35db9400b257
 	github.com/nats-io/nsc/v2 v2.8.5
@@ -47,7 +48,6 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/nats-io/cliprompts/v2 v2.0.0-20231014115920-801ca035562a // indirect
 	github.com/nats-io/jsm.go v0.1.0 // indirect
-	github.com/nats-io/jwt/v2 v2.5.3 // indirect
 	github.com/nats-io/nkeys v0.4.6 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/rhysd/go-github-selfupdate v1.2.3 // indirect
