@@ -1,6 +1,7 @@
 package src
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -59,6 +60,23 @@ func updateDashboard(c echo.Context) error {
 	err = storeJson(dashboardFile, obj)
 	if err != nil {
 		return badRequest(c, err)
+	}
+
+	// check for accounts are set operator
+	for _, account := range obj.Accounts {
+		if account.Operator == "" {
+			return badRequest(c, fmt.Errorf("account %s has no operator", account.Name))
+		}
+	}
+
+	// check for users are set operator and account
+	for _, user := range obj.Users {
+		if user.Operator == "" {
+			return badRequest(c, fmt.Errorf("user %s has no operator", user.Name))
+		}
+		if user.Account == "" {
+			return badRequest(c, fmt.Errorf("user %s has no account", user.Name))
+		}
 	}
 
 	return c.JSON(200, &SimpleJSONResponse{
