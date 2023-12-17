@@ -274,10 +274,10 @@ type updateUserForm struct {
 	ResponseTTL      string `json:"response_ttl,omitempty"`
 	AllowPubResponse string `json:"allow_pub_response,omitempty"`
 	AllowPub         string `json:"allow_pub,omitempty"`
-	AllowPubSub      string `json:"allow_pubsub,omitempty"`
+	AllowPubsub      string `json:"allow_pubsub,omitempty"`
 	AllowSub         string `json:"allow_sub,omitempty"`
 	DenyPub          string `json:"deny_pub,omitempty"`
-	DenyPubSub       string `json:"deny_pubsub,omitempty"`
+	DenyPubsub       string `json:"deny_pubsub,omitempty"`
 	DenySub          string `json:"deny_sub,omitempty"`
 	RmResponsePerms  string `json:"rm_response_perms,omitempty"`
 	Rm               string `json:"rm,omitempty"`
