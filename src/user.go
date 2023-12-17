@@ -7,6 +7,7 @@ import (
 	"github.com/nats-io/nsc/cmd/store"
 	nsc "github.com/nats-io/nsc/v2/cmd"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -20,7 +21,7 @@ func init() {
 
 	root.GET("creds/operator/:operator/account/:account/user/:name", generateUser)
 
-	root.DELETE("operator/:operator/account/:account/user/:name", revokeUser)
+	root.DELETE("operator/:operator/account/:account/user/:name", deleteUser)
 
 	root.PATCH("operator/:operator/account/:account/user/:name", updateUser)
 }
@@ -41,25 +42,20 @@ type addUserForm struct {
 // @Failure		400			{object}	SimpleJSONResponse	"Bad request"
 // @Failure		500			{object}	string				"Internal error"
 func addUser(c echo.Context) error {
-	cmd := nsc.CreateAddUserCmd()
-	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
-		return err
-	}
-	if err := nsc.GetConfig().SetAccount(c.Param("account")); err != nil {
-		return err
-	}
+	operator := c.Param("operator")
+	account := c.Param("account")
 
-	s := &addUserForm{}
-	err := setFlagsIfInJson(cmd, s, c)
+	if operator == "" || account == "" {
+		return badRequest(c, fmt.Errorf("operator and account must be specified"))
+	}
+	err := runNsc(nil, nil, "select", "operator", c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
+	a := addUserForm{}
 
-	if err := cmd.Flags().Set("account", nsc.GetConfig().Account); err != nil {
-		return badRequest(c, err)
-	}
-
-	if err := cmd.RunE(cmd, []string{s.Name}); err != nil {
+	err = runNsc(&a, c, "add", "user", "--account", account)
+	if err != nil {
 		return badRequest(c, err)
 	}
 
@@ -215,6 +211,50 @@ func revokeUser(c echo.Context) error {
 	return c.JSON(200, map[string]string{"status": "ok"})
 }
 
+// @Tags			User
+// @Router			/operator/{operator}/account/{account}/user/{name} [delete]
+// @Param			name		path	string	true	"Username"
+// @Param			account		path	string	true	"Account name"
+// @Param			operator	path	string	true	"Operator name"
+// @Summary		Revokes a user
+// @Description	Revokes a user
+// @Success		200	{object}	map[string]string	"Operator description"
+// @Failure		500	{object}	string				"Internal error"
+func deleteUser(c echo.Context) error {
+	// delete from store without nsc
+
+	operator := c.Param("operator")
+	account := c.Param("account")
+	user := c.Param("name")
+
+	if operator == "" || account == "" || user == "" {
+		return badRequest(c, fmt.Errorf("operator, account and user must be specified"))
+	}
+
+	storeRoot := nsc.GetConfig().StoreRoot
+	if storeRoot == "" {
+		storeRoot = os.Getenv("NSC_STORE")
+	}
+
+	usersDir := fmt.Sprintf("%s/%s/%s/%s/%s", storeRoot, operator, store.Accounts, account, store.Users)
+	userFile := fmt.Sprintf("%s/%s.jwt", usersDir, user)
+
+	if _, err := os.Stat(userFile); os.IsNotExist(err) {
+		return badRequest(c, fmt.Errorf("user %s does not exist", user))
+	}
+
+	if err := os.Remove(userFile); err != nil {
+		return badRequest(c, err)
+	}
+
+	return c.JSON(200,
+		&SimpleJSONResponse{
+			Status:  "200",
+			Message: "User deleted",
+		},
+	)
+}
+
 type updateUserForm struct {
 	Tag              string `json:"tag,omitempty"`
 	RmTag            string `json:"rm_tag,omitempty"`
@@ -254,25 +294,23 @@ type updateUserForm struct {
 // @Success		200	{object}	SimpleJSONResponse	"Status ok"
 // @Failure		500	{object}	string				"Internal error"
 func updateUser(c echo.Context) error {
-	var updateCmd = lookupCommand(nsc.GetRootCmd(), "edit")
-	var updateUserCmd = lookupCommand(updateCmd, "user")
+	operator := c.Param("operator")
+	account := c.Param("account")
+	user := c.Param("name")
 
-	if err := nsc.GetConfig().SetOperator(c.Param("operator")); err != nil {
-		return badRequest(c, err)
-	}
-	if err := nsc.GetConfig().SetAccount(c.Param("account")); err != nil {
-		return badRequest(c, err)
-	}
-	if err := updateUserCmd.Flags().Set("account", c.Param("account")); err != nil {
-		return badRequest(c, err)
+	if operator == "" || account == "" || user == "" {
+		return badRequest(c, fmt.Errorf("operator, account and user must be specified"))
 	}
 
-	err := setFlagsIfInJson(updateUserCmd, &updateUserForm{}, c)
+	err := runNsc(nil, nil, "select", "operator", c.Param("operator"))
 	if err != nil {
 		return badRequest(c, err)
 	}
 
-	if err := updateUserCmd.RunE(updateUserCmd, []string{c.Param("name")}); err != nil {
+	a := updateUserForm{}
+
+	err = runNsc(&a, c, "edit", "user", "--account", account, "--name", user)
+	if err != nil {
 		return badRequest(c, err)
 	}
 
